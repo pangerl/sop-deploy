@@ -1,0 +1,20 @@
+[Unit]
+Description="VictoriaMetrics service"
+After=network.target
+
+[Service]
+Type=simple
+
+ExecStart={{ victoria_dir }}/victoria-metrics-prod
+WorkingDirectory={{ victoria_dir }}
+
+Restart=on-failure
+SuccessExitStatus=0
+LimitNOFILE=65536
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=victoriametrics
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,26 @@
+- name: create working_dir directory
+  file:
+    path: "/data/n9e-edge"
+    state: directory
+
+- name: download n9e-edge tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/n9e-v7.0-linux-amd64.tar.gz"
+    dest: /data/n9e-edge/
+
+- name: Template edge.toml.template file to conf
+  template:
+    src: edge.toml.j2
+    dest: "{{ working_dir }}/etc/edge/edge.toml"
+
+- name: Template n9e_edge systemd service file
+  template:
+    src: n9e-edge.service.j2
+    dest: "{{ n9e_edge_unit_path }}"
+    mode: 0644
+
+- name: Start the n9e_edge service
+  systemd:
+    name: n9e-edge.service
+    state: started
+    enabled: yes

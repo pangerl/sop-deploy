@@ -1,0 +1,16 @@
+---
+elastic_unit_path: /usr/lib/systemd/system/elasticsearch.service
+
+nodename: "{%- if inventory_hostname == groups.es[0] -%} \
+                node-1 \
+            {%- elif inventory_hostname == groups.es[1] -%} \
+                node-2 \
+            {%- else -%} \
+                node-3 \
+            {%- endif -%}"
+
+
+# 集群节点的IP地址
+node_ad1: "{{ groups.es[0] }}"
+node_ad2: "{{ groups.es[1] }}"
+node_ad3: "{{ groups.es[2] }}"

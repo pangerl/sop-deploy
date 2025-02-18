@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+# https://github.com/pangerl/nacos_check
+  nacoscheck:
+    image: "ka-tcr.tencentcloudcr.com/middleware/nacos-check:0.7.4"
+    container_name: nacoscheck
+    hostname: nacoscheck
+    restart: always
+    ports:
+      - "8099:8099"
+    environment:
+      TZ: Asia/Shanghai
+      nacos_url: "http://{{ nacos_lst[0] }}:{{ nacos_port }}"
+      username: {{ nacos_user }}
+      password: {{ nacos_pw }}
+

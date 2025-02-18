@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  {{ container_name }}:
+    image: bitnami/{{ container_image }}
+    network_mode: "bridge"
+    container_name: {{ container_name }}
+    shm_size: 1g
+    ports:
+      - {{ pg_port }}:{{ pg_port }}
+    volumes:
+      - {{ working_dir }}/data:/bitnami/postgresql
+      - /etc/localtime:/etc/localtime
+    environment:
+      - POSTGRESQL_MAX_CONNECTIONS=4000
+      - POSTGRESQL_TIMEZONE=PRC
+      - POSTGRESQL_LOG_TIMEZONE=PRC
+      - POSTGRESQL_POSTGRES_PASSWORD={{ pg_password }}
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD={{ pg_password }}
+      - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=1
+      - REPMGR_USERNAME=repmgr
+      - REPMGR_PASSWORD=repmgr123
+      - REPMGR_PRIMARY_HOST=pg-0
+      - REPMGR_PRIMARY_PORT={{ pg_port }}
+      - REPMGR_PARTNER_NODES=pg-0,pg-1:{{ pg_port }}
+      - REPMGR_NODE_NAME={{ container_name }}
+      - REPMGR_NODE_NETWORK_NAME={{ container_name }}
+      - REPMGR_PORT_NUMBER={{ pg_port }}
+    restart: always
+    extra_hosts:
+      - "pg-0:{{ pg_0 }}"
+      - "pg-1:{{ pg_1 }}"

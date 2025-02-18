@@ -1,0 +1,180 @@
+- name: Create doris group
+  group:
+    name: "{{ doris_user }}"
+    state: present
+    system: yes
+
+- name: Create doris user
+  user:
+    name: "{{ doris_user }}"
+    group: "{{ doris_user }}"
+    state: present
+    createhome: no
+    system: yes
+
+- name: download doris tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/apache-doris-2.1.6-bin-x64.tar.gz"
+    dest: /data
+    group: "{{ doris_user }}"
+    owner: "{{ doris_user }}"
+    creates: /data/apache-doris-2.1.6-bin-x64
+
+- name: 配置 doris 软链接
+  file:
+    src: "/data/apache-doris-2.1.6-bin-x64"
+    dest: "{{ doris_home }}"
+    group: "{{ doris_user }}"
+    owner: "{{ doris_user }}"
+    state: link
+    force: yes
+  ignore_errors: true
+
+- name: Setting present kernel params
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    ignoreerrors: yes
+    state: present
+  with_items:
+    - { name: 'vm.swappiness', value: 0  }
+    - { name: 'vm.max_map_count', value: 2000000 }
+  become: yes
+
+- name: add sysctl
+  shell: "sysctl -w vm.max_map_count=2000000 &&  swapoff -a"
+
+- name: 关闭透明大页
+  shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled && echo never > /sys/kernel/mm/transparent_hugepage/defrag"
+  
+- name: add java_home
+  shell: "sed -i 's#^export PID_DIR.*#export PID_DIR JAVA_HOME={{ java_home }}#g' {{ doris_home }}/fe/bin/start_fe.sh && sed -i 's#^export PID_DIR.*#export PID_DIR JAVA_HOME={{ java_home }}#g' {{ doris_home }}/be/bin/start_be.sh"
+
+- name: Template fe.conf.template file to conf
+  template:
+    src: fe.conf.j2
+    dest: "{{ doris_home }}/fe/conf/fe.conf"
+    group: "{{ doris_user }}"
+    owner: "{{ doris_user }}"
+    mode: '0644'
+
+- name: Template be.conf.template file to conf
+  template:
+    src: be.conf.j2
+    dest: "{{ doris_home }}/be/conf/be.conf"
+    group: "{{ doris_user }}"
+    owner: "{{ doris_user }}"
+    mode: '0644'
+
+- name: Template doris-be.service system file
+  template:
+    src: doris-be.service.j2
+    dest: "/usr/lib/systemd/system/doris-be.service"
+    group: "{{ doris_user }}"
+    owner: "{{ doris_user }}"
+    mode: '0644'
+
+- name: Template doris-fe.service system file
+  template:
+    src: doris-fe.service.j2
+    dest: "/usr/lib/systemd/system/doris-fe.service"
+    group: "{{ doris_user }}"
+    owner: "{{ doris_user }}"
+    mode: '0644'
+
+# - name: Template doris-fe-init.service system file
+#   template:
+#     src: doris-fe-init.service.j2
+#     dest: "/usr/lib/systemd/system/doris-fe-init.service"
+#     group: "{{ doris_user }}"
+#     owner: "{{ doris_user }}"
+#     mode: '0644'
+
+- block:
+
+  # - name: Template doris-broker.service system file
+  #   template:
+  #     src: doris-broker.service.j2
+  #     dest: "/usr/lib/systemd/system/doris-broker.service"
+  #     group: "{{ doris_user }}"
+  #     owner: "{{ doris_user }}"
+  #     mode: '0644'
+
+  - name: start doris fe master
+    systemd:
+      name: doris-fe.service
+      state: started
+      daemon_reload: yes
+      enabled: yes
+
+  when: "doris_role == 'master'"
+
+- block:
+
+  # - name: wait for 9010 to be running
+  #   wait_for:
+  #     port: "9010"
+  #     host: "{{ groups.doris[0] }}"
+  #     delay: 10
+  #     timeout: 500
+
+  - name: wait for 9030 to be running
+    wait_for:
+      port: "9030"
+      host: "{{ groups.doris[0] }}"
+      delay: 10
+      timeout: 500
+
+  - name: add fe_cluster config to databases
+    shell: mysql -h{{ groups.doris[0] }} -P9030 -uroot -e 'ALTER SYSTEM ADD FOLLOWER "{{ groups.doris[1] }}:9010";ALTER SYSTEM ADD FOLLOWER "{{ groups.doris[2] }}:9010";'
+    # ignore_errors: True
+    connection: local
+    when: fe_cluster | bool
+
+  - name: add BACKEND config to databases
+    shell: mysql -h{{ groups.doris[0] }} -P9030 -uroot -e '{{ BACKEND_SQL }}'
+    # ignore_errors: True
+
+  - name: set databases paasword
+    shell: mysql -h{{ groups.doris[0] }} -P9030 -uroot -e 'set PASSWORD FOR "root"=PASSWORD("Wshoto!@2024");'
+    # ignore_errors: True
+
+  run_once: true
+  connection: local
+
+- block:
+
+  - name: reloaded doris-fe server
+    systemd:
+      name: doris-fe.service
+      state: stopped
+      daemon_reload: yes
+      enabled: yes
+
+  - name: start doris-fe server
+    shell: "bin/start_fe.sh --helper {{ groups.doris[0] }}:9010 --daemon"
+    args:
+      chdir: "{{ doris_home }}/fe"
+    become: yes
+    become_user: "{{ doris_user }}"
+
+  when: "doris_role == 'follower' and fe_cluster | bool "
+
+- name: start doris be
+  systemd:
+    name: doris-be.service
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
+#- name: start doris broker
+#  systemd:
+#    name: doris-broker.service
+#    state: started
+#    enabled: yes
+
+- name: 内置的 Web UI
+  debug:
+    msg:
+    - "访问地址： http://{{ groups.doris[0] }}:18030 ,账号密码： root/Wshoto!@2024"
+  run_once: true

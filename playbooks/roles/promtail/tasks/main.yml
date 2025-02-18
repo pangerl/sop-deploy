@@ -1,0 +1,40 @@
+
+
+- name: 添加 promtail 用户
+  user:
+    name: promtail
+    system: yes
+    createhome: no
+    groups: adm
+    # append参数会让groups中的两个组成为用户的附加组
+    append: yes
+
+- name: download promtail tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/promtail-linux-amd64.zip"
+    dest: "/usr/local/bin"
+
+- name: 添加执行权限
+  file:
+    src: /usr/local/bin/promtail-linux-amd64
+    dest: /usr/local/bin/promtail
+    state: link
+    mode: 0755
+
+- name: Template promtail config file
+  template:
+    src: config-promtail.yml.j2
+    dest: "/usr/local/bin/config-promtail.yml"
+    mode: 0644
+
+- name: Template promtail systemd service file
+  template:
+    src: promtail.service.j2
+    dest: "/etc/systemd/system/promtail.service"
+    mode: 0644
+
+- name: Start the promtail service
+  systemd:
+    name: promtail.service
+    state: started
+    enabled: yes

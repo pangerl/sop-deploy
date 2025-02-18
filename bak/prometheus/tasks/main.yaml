@@ -1,0 +1,14 @@
+
+- include: prometheus.yaml
+
+- include: grafana.yaml
+  when: server_enabled | bool
+
+- include: alertmanager.yaml
+  when: server_enabled | bool
+
+- include: blackbox.yaml
+  when: blackbox_enabled | bool
+
+- include: elasticsearch.yaml
+  when: es_enabled | bool

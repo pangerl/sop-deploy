@@ -1,0 +1,55 @@
+- hosts:
+  - localhost
+  connection: local
+  gather_facts: false
+  vars:
+    MYSQL_HOST: "{{ groups.mysql[0] }}"
+    MYSQL_PORT: 3306
+    MYSQL_USER: "root"
+    MYSQL_PASSWORD: "Wshoto!@2024"
+    xxl_db_name: "xxl_job"
+    working_dir: "/data/xxl-job"
+  tasks:
+    - name: 获取是否已经安装 mysql-client
+      shell: 'which mysql || echo "NoFound"'
+      register: is_mysql
+
+    - block:
+      - name: download rpm
+        unarchive:
+          src: "{{ project_dir }}/packages/binary_tag/mysql-client.tgz"
+          dest: /tmp
+          creates: /tmp/mysql-client
+
+      - name: install mysql-client
+        shell: rpm -Uvh ./*.rpm --nodeps --force
+        args:
+          chdir: /tmp/mysql-client
+      when: "'NoFound' in is_mysql.stdout"
+
+#    - name: Create new databases with names 'xxl_job'
+#      shell: mysql -h{{ MYSQL_HOST }} -P{{ MYSQL_PORT }} -u{{ MYSQL_USER }} -p'{{ MYSQL_PASSWORD }}' -e 'create database if not exists `{{ xxl_db_name }}`;use {{ xxl_db_name }};source {{ project_dir }}/packages/sql/xxl_job{{ version }}.sql;'
+#      run_once: true
+#      ignore_errors: True
+#      tags:
+#        - create_db
+#    
+#    - name : xxl-job集群添加锁配置
+#      shell: mysql -h{{ MYSQL_HOST }} -P{{ MYSQL_PORT }} -u{{ MYSQL_USER }} -p'{{ MYSQL_PASSWORD }}' -e 'use xxl_job;INSERT INTO `xxl_job_lock` ( `lock_name`) VALUES ( 'schedule_lock');UPDATE xxl_job.xxl_job_info SET executor_route_strategy='FAILOVER';'
+#      run_once: true
+#      ignore_errors: True
+#      when: "XXL_JOB_MODEL == 'cluster'"
+
+- name: 部署 xxl-job
+  hosts:
+    - xxl_job
+  roles:
+    - xxl-job
+  gather_facts: false
+  vars:
+    MYSQL_HOST: "{{ groups.mysql[0] }}"
+    MYSQL_PORT: 3306
+    MYSQL_USER: "root"
+    MYSQL_PASSWORD: "Wshoto!@2024"
+    xxl_db_name: "xxl_job"
+    working_dir: "/data/xxl-job"

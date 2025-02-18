@@ -1,0 +1,37 @@
+- hosts:
+  - localhost
+  connection: local
+  gather_facts: false
+  vars:
+    pg_ip: "{{ groups.postgres[0] }}"
+    pg_port: 5432
+    # 默认用户 postgres
+    pg_password: "Wshoto!@2024"
+    # 数据库备份目录
+    base_dir: /data/backup_data/postgres
+  tasks:
+    - name: 下载备份脚本
+      template: src=pg_backup.sh.j2 dest=/opt/pg_backup.sh mode=0755
+
+    - name: backup pg data
+      cron:
+        name: "backup pg data"
+        minute: "30"
+        hour: "1"
+        job: "sh /opt/pg_backup.sh"
+
+
+- name: 部署 postgres
+  hosts:
+    - postgres
+  roles:
+  - { role: postgres-single, when: "PG_MODEL == 'single'" }
+  - { role: postgres-replication, when: "PG_MODEL == 'replication'" }
+  - { role: postgres-ha, when: "PG_MODEL == 'ha'" }
+  gather_facts: false
+  vars:
+    working_dir: "/data/postgres"
+    pg_port: 5432
+    pg_pool_port: 5433
+    # 默认用户 postgres
+    pg_password: "Wshoto!@2024"

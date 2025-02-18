@@ -1,0 +1,221 @@
+---
+# - name: Load OS-specific variables
+#   include_vars: "{{ item }}"
+#   with_first_found:
+#     - ../vars/{{ ansible_os_family }}.yml
+#     - ../vars/{{ ansible_distribution_release }}.yml
+#   ignore_errors: True
+
+- name: Create elastic group
+  group:
+    name: "{{ elastic_group }}"
+    state: present
+    system: yes
+  when: elastic_create_user_group | bool
+  tags:
+    - elastic_group
+
+- name: Create elastic user
+  user:
+    name: "{{ elastic_user }}"
+    group: "{{ elastic_group }}"
+    state: present
+    createhome: no
+    system: yes
+  when: elastic_create_user_group | bool
+  tags:
+    - elastic_user
+
+- name: Check if elastic has already been downloaded and unpacked
+  stat:
+    path: "{{ elastic_install_dir }}"
+  register: dir
+
+- name: Download elastic
+  copy: src={{ project_dir }}/packages/binary_tag/{{ elastic_package }} dest=/tmp mode=0644
+  when: not dir.stat.exists
+  tags:
+    - elastic_download
+
+- name: Create elastic installation dir 
+  file:
+    path: "{{ item }}"
+    state: directory
+    group: "{{ elastic_group }}"
+    owner: "{{ elastic_user }}"
+    mode: 0755
+  with_items:
+    - "{{ elastic_install_dir }}"
+    - "{{ elastic_log_dir }}"
+    - "{{ elastic_data_dir }}"
+  tags:
+    - elastic_dirs
+
+- name: Unpack elastic
+  unarchive:
+    src: /tmp/{{ elastic_package }}
+    dest: "{{ elastic_install_dir }}"
+    copy: no
+    extra_opts: [--strip-components=1]
+    group: "{{ elastic_group }}"
+    owner: "{{ elastic_user }}"
+  when: not dir.stat.exists
+  tags:
+    - elastic_unpack
+
+- name: Create symlink to elastic installation
+  file:
+    src: "{{ elastic_install_dir }}"
+    dest: "{{ elastic_dir }}/elastic"
+    state: link
+    group: "{{ elastic_group }}"
+    owner: "{{ elastic_user }}"
+  tags:
+    - elastic_dirs
+
+- name: 检查limits.conf文件是否已经存在关于es的配置项
+  shell: sed "/# Elasticsearch file limits/!d" /etc/security/limits.conf
+  register: es_result
+  ignore_errors: True
+
+- name: 配置es需要的最大文件打开数，最大进程数
+  shell:
+    cmd: |
+      echo "# Elasticsearch file limits
+      es soft nofile 65536
+      es hard nofile 65536
+      es soft nproc 4096
+      es hard nproc 4096" >> /etc/security/limits.conf
+  when: es_result.stdout == ""
+
+- name: 检查sysctl.conf文件是否已经存在关于es的配置项   
+  shell: sed "/# Elasticsearch file limits/!d" /etc/sysctl.conf
+  register: sysctl_result
+  ignore_errors: True
+
+- name: sysctl.conf-配置es一个进程拥有的虚拟内存vma的数量
+  shell:
+    cmd: |
+      echo "# Elasticsearch file limits
+      vm.max_map_count = 655360" >> /etc/sysctl.conf
+  when: sysctl_result.stdout == ""
+
+- name: sysctl.conf配置生效
+  shell:
+    cmd: |
+      sysctl -p
+
+- name: 添加Elasticsearch配置文件
+  template:
+    src: elasticsearch.yml.j2
+    dest: "{{ elastic_dir }}/elastic/config/elasticsearch.yml"
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_group }}"
+    mode: 0644
+  tags:
+    - elastic_config
+    
+
+- name: 生成证书到es安装目录的config文件夹
+  copy:
+    src: elastic-certificates.p12
+    dest: "{{ elastic_dir }}/elastic/config/elastic-certificates.p12"
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_group }}"
+    mode: 0644
+  tags:
+    - elastic_config
+
+- name: 修改es jvm 内存使用
+  template:
+    src: jvm.options.j2
+    dest: "{{ elastic_dir }}/elastic/config/jvm.options"
+    owner: "{{ elastic_user }}"
+    group: "{{ elastic_group }}"
+    mode: 0644
+  tags:
+    - elastic_config
+
+- name: install analysis-ik
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/analysis-ik.tgz"
+    dest: "{{ elastic_dir }}/elastic/plugins"
+    creates: "{{ elastic_dir }}/elastic/plugins/analysis-ik"
+    group: "{{ elastic_group }}"
+    owner: "{{ elastic_user }}"
+
+- name: Template Elasticsearch systemd service file
+  template:
+    src: elasticsearch.service.j2
+    dest: "{{ elastic_unit_path }}"
+    group: "{{ elastic_user }}"
+    owner: "{{ elastic_group }}"
+    mode: 0644
+  tags:
+    - elastic_service
+
+- name: Start the elastic service
+  systemd:
+    name: elasticsearch.service
+    state: started
+    enabled: yes
+  when: elastic_start
+  tags:
+    - elastic_service
+
+# - include_tasks: add_user.yaml
+#   when: inventory_hostname == node_ad3
+
+- name: wait for 9200 to be running
+  wait_for: 
+    port: "{{ elastic_http_port | int }}"  
+    host: "{{ node_ad1 }}"
+    delay: 10 
+    timeout: 500
+  tags: add_user
+  run_once: true
+  connection: local
+
+- name: create user
+  become: yes
+  become_user: "{{ elastic_user }}"
+  become_method: su
+  shell: "{{ elastic_dir }}/elastic/bin/elasticsearch-users useradd admin -p admin123 -r superuser"
+  ignore_errors: true
+  tags: add_user
+  run_once: true
+
+- name: wait for 9300 to be running
+  wait_for: 
+    port: "{{ elastic_tcp_port | int }}"  
+    host: "{{ node_ad1 }}"
+    delay: 10 
+    timeout: 300
+  tags: add_user
+  run_once: true
+  connection: local
+
+- name: Change elastic password
+  uri:
+    url: "http://{{ node_ad1 }}:{{ elastic_http_port }}/_xpack/security/user/{{ es_user }}/_password?pretty"
+    method: PUT
+    headers:
+      Content-Type: "application/json"
+    user: "admin"
+    password: "admin123"
+    body_format: json
+    body: '{"password":"{{ es_password }}"}'
+    force_basic_auth: yes
+  # ignore_errors: true
+  tags: add_user
+  run_once: true
+  connection: local
+
+- name: Delete the Superuser
+  become: yes
+  become_user: "{{ elastic_user }}"
+  become_method: su
+  shell: "{{ elastic_dir }}/elastic/bin/elasticsearch-users userdel admin"
+  # ignore_errors: true
+  tags: add_user
+  run_once: true

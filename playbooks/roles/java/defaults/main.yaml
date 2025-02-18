@@ -1,0 +1,8 @@
+
+# jdk_name: "openjdk-11+28_linux-x64_bin.tar.gz"
+# jdk_tgz: "jdk-8u211-linux-x64.tar.gz"
+jdk_tgz: "openjdk-8u362.tgz"
+jdk_name: "openjdk-8u362"
+JAVA_HOME: "/opt/java"
+
+jdk_dir: "/opt/{{ jdk_name }}"

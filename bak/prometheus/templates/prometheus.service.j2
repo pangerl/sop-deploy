@@ -1,0 +1,50 @@
+[Unit]
+Description=Prometheus Server 
+Documentation=https://prometheus.io/docs/introduction/overview/ 
+After=network.target
+
+[Service]
+Type=simple
+Environment="GOMAXPROCS=4"
+User={{ prometheus_user }}
+Group={{ prometheus_group }}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart={{ prometheus_dir }}/prometheus \
+{% if server_enabled | bool %}
+  --storage.tsdb.path={{ prometheus_dir }}/data \
+  --storage.tsdb.retention.time=7d \
+{% else %}
+  --storage.agent.path={{ prometheus_dir }}/data-agent \
+{% endif %}
+  --web.console.libraries={{ prometheus_dir }}/console_libraries \
+  --web.console.templates={{ prometheus_dir }}/consoles \
+  --web.listen-address=:{{ prometheus_port }} \
+  --web.enable-remote-write-receiver \
+{% if not server_enabled | bool %}
+  --enable-feature=agent \
+{% endif %}
+  --web.enable-lifecycle \
+  --config.file={{ prometheus_dir }}/prometheus.yml
+CapabilityBoundingSet=CAP_SET_UID
+LimitNOFILE=65000
+LockPersonality=true
+NoNewPrivileges=true
+MemoryDenyWriteExecute=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectHome=true
+RemoveIPC=true
+RestrictSUIDSGID=true
+#SystemCallFilter=@signal @timer
+
+PrivateUsers=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+
+SyslogIdentifier=prometheus
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

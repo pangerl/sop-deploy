@@ -1,0 +1,22 @@
+---
+# Installation variables
+
+# prometheus_create_user_group: true
+# prometheus_group: prometheus
+# prometheus_user: prometheus
+
+data_root_dir: /data
+blackbox_dir: "{{ data_root_dir }}/blackbox_exporter"
+
+blackbox_unit_path: /etc/systemd/system/blackbox_exporter.service
+victoria_dir: "/data/victoria"
+blackbox_package: blackbox_exporter-0.24.0.linux-amd64.tar.gz
+
+
+victoria_tgz: "victoria-metrics-linux-amd64-v1.102.0.tar.gz"
+
+n9e_edge_unit_path: /etc/systemd/system/n9e-edge.service
+victoria_unit_path: /etc/systemd/system/victoriametrics.service
+
+
+local_ip: "{{ inventory_hostname }}"

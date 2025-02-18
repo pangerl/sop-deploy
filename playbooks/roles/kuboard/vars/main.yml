@@ -1,0 +1,11 @@
+# 镜像名称
+container_name: "kuboard"
+container_image: "kuboard:v3"
+kuboard_ip: "{{ inventory_hostname }}"
+
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

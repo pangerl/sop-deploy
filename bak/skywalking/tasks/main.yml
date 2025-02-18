@@ -1,0 +1,127 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+    with_items:
+    - "{{ es_image }}"
+    - "{{ oap_image }}"
+    - "{{ ui_image }}"
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+    with_items:
+    - "{{ es_image }}"
+    - "{{ oap_image }}"
+    - "{{ ui_image }}"
+    ignore_errors: true
+    
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- name: create data directory
+  file:
+    path: "{{ working_dir }}/elasticsearch-data"
+    state: directory
+    owner: 1000
+    group: 1000
+
+- name: create logs directory
+  file:
+    path: "{{ working_dir }}/elasticsearch-logs"
+    state: directory
+    owner: 1000
+    group: 1000
+
+- name: remove container
+  docker_container:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - "elasticsearch"
+    - "oap"
+    - "ui"
+
+- name: Create a network
+  docker_network:
+    name: "{{ docker_network_name }}"
+
+- name: create elasticsearch
+  docker_container:
+    name: "elasticsearch"
+    image: "docker.elastic.co/elasticsearch/elasticsearch-oss:7.4.2"
+    pull: "{{ pull }}"
+    volumes:
+      - "{{ working_dir }}/elasticsearch-data:/usr/share/elasticsearch/data"
+      - "{{ working_dir }}/elasticsearch-logs:/usr/share/elasticsearch/logs"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    env:
+      discovery.type: "single-node"
+      ES_JAVA_OPTS: "-Xms{{ jvm_mem }} -Xmx{{ jvm_mem }}"
+      TAKE_FILE_OWNERSHIP: "true"
+      bootstrap.memory_lock: "true"
+    ulimits:
+      - "nofile:65536:65536"
+      - "memlock:-1:-1"
+    capabilities:
+      - IPC_LOCK
+    state: started
+    restart_policy: always
+    networks:
+      - name: "{{ docker_network_name }}"
+
+- name: create oap
+  docker_container:
+    name: "oap"
+    image: "apache/skywalking-oap-server:8.8.1"
+    pull: "{{ pull }}"
+    links:
+      - "elasticsearch"
+    healthcheck:
+      test: [ "CMD-SHELL", "/skywalking/bin/swctl ch" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    env:
+      SW_STORAGE: elasticsearch
+      SW_STORAGE_ES_CLUSTER_NODES: elasticsearch:9200
+      SW_HEALTH_CHECKER: default
+      SW_TELEMETRY: prometheus
+      JAVA_OPTS: "-Xms2048m -Xmx2048m"
+      SW_STORAGE_DAY_STEP: '1'
+      SW_CORE_RECORD_DATA_TTL: '2'
+      SW_CORE_METRICS_DATA_TTL: '2'
+    ports:
+     - "{{ oap_port1 }}:11800"
+     - "{{ oap_port2 }}:12800"
+    state: started
+    restart_policy: always
+    networks:
+      - name: "{{ docker_network_name }}"
+
+- name: create ui
+  docker_container:
+    name: "ui"
+    image: "apache/skywalking-ui:8.8.1"
+    pull: "{{ pull }}"
+    links:
+      - "oap"
+    env:
+      SW_OAP_ADDRESS: http://oap:12800
+    ports:
+     - "{{ ui_port }}:8080"
+    state: started
+    restart_policy: always
+    networks:
+      - name: "{{ docker_network_name }}"

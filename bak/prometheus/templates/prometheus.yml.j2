@@ -1,0 +1,56 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+{% if not server_enabled | bool %}
+  external_labels:
+    project: "{{ project }}"
+{% endif %}
+
+{% if server_enabled | bool %}
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: [127.0.0.1:9093]
+
+rule_files:
+  - rules/*.yml
+{% endif %}
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["127.0.0.1:{{ prometheus_port }}"]
+
+  - job_name: 'telegraf'
+    scrape_interval: 20s
+    file_sd_configs:
+    - files:
+      - configs/telegraf.json
+
+{% if nacos_enabled | bool %}
+  - job_name: 'nacos_svc'
+    metrics_path: /probe
+    params:
+      module: [tcp_connect]
+    http_sd_configs:
+    - url: http://127.0.0.1:8099
+      refresh_interval: 500s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+{% endif %}
+
+{% if es_enabled | bool %}
+  - job_name: 'elasticsearch_exporter'
+    static_configs:
+    - targets: ['127.0.0.1:9114']
+{% endif %}
+
+{% if not server_enabled | bool %}
+remote_write:
+  - url: "http://106.55.254.109:9090/api/v1/write"
+{% endif %}

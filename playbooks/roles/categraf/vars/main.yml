@@ -1,0 +1,4 @@
+
+categraf_tgz: "categraf-v0.3.68-linux-amd64.tar.gz"
+
+categraf_unit_path: /etc/systemd/system/categraf.service

@@ -1,0 +1,77 @@
+- name: Add mappings to /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} pgha"
+    block: |
+      {{ pg_0 }} pg-0
+      {{ pg_1 }} pg-1
+
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- name: create data directory
+  file:
+    path: "{{ working_dir }}/data"
+    state: directory
+    owner: 1001
+    group: root
+    mode: 'go=rwx'
+    recurse: yes
+
+- block:
+  - name: download image {{ container_name }}
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_file }} dest={{ image_dir }}/{{ container_file }} mode=0644
+
+  - name: load image {{ container_name }}
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+  
+# - name: copy postgresql.conf
+#   copy: src=postgresql.conf dest={{ working_dir }}/postgresql.conf mode=0644
+
+# - name: 下载备份脚本
+#   template: src=pg_backup.sh.j2 dest={{ working_dir }}/pg_backup.sh mode=0755
+
+- name: copy docker-compose-pg.yml file
+  template: src=docker-compose-pg.yml.j2 dest={{ working_dir }}/docker-compose-pg.yml mode=0755
+
+- name: remove container {{ container_name }}
+  shell: docker-compose -f docker-compose-pg.yml down
+  args:
+    chdir: "{{ working_dir }}"
+
+- name: create container  {{ container_name }}
+  shell: docker-compose -f docker-compose-pg.yml up -d
+  args:
+    chdir: "{{ working_dir }}"
+
+- block:
+  - name: download image {{ pgpool_container_name }}
+    copy: src={{ project_dir }}/packages/middle_img/{{ pgpool_container_file }} dest={{ image_dir }}/{{ pgpool_container_file }} mode=0644
+ 
+  - name: load image {{ pgpool_container_name }}
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ pgpool_container_file }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+  
+    
+- name: copy docker-compose-pgpool.yml file
+  template: src=docker-compose-pgpool.yml.j2 dest={{ working_dir }}/docker-compose-pgpool.yml mode=0755
+  
+- name: remove container {{ pgpool_container_name }}
+  shell: docker-compose -f docker-compose-pgpool.yml down
+  args:
+    chdir: "{{ working_dir }}"
+  
+- name: create container  {{ pgpool_container_name }}
+  shell: docker-compose -f docker-compose-pgpool.yml up -d
+  args:
+    chdir: "{{ working_dir }}"

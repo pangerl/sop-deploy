@@ -1,0 +1,13 @@
+
+es_name: "elasticsearch-single"
+# kibana_name: "kibana"
+es_image: "elasticsearch:7.17.19"
+# kibana_image: "kibana:7.17.19"
+es_ip: "{{ groups.es[0] }}"
+docker_network_name: "es-tier"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

@@ -1,0 +1,16 @@
+# # collect interval
+interval = 30
+
+[[instances]]
+# # commands, support glob
+commands = [
+     "{{ categraf_dir }}/scripts/*.sh"
+]
+
+# # timeout for each command to complete
+# timeout = 5
+
+# # interval = global.interval * interval_times
+# interval_times = 1
+
+data_format = "prometheus"

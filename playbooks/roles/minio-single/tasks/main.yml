@@ -1,0 +1,37 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- name: create data directory
+  file:
+    path: "{{ working_dir }}/data"
+    state: directory
+    owner: 1001
+    group: 1001
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_file }} dest={{ image_dir }}/{{ container_file }} mode=0644
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- name: copy docker-compose-minio.yml file
+  template: src=docker-compose-minio.yml.j2 dest={{ working_dir }}/docker-compose-minio.yml mode=0755
+
+- name: remove container  minio
+  shell: docker-compose -f docker-compose-minio.yml down
+  args:
+    chdir: "{{ working_dir }}"
+
+- name: create container  minio
+  shell: docker-compose -f docker-compose-minio.yml up -d
+  args:
+    chdir: "{{ working_dir }}"

@@ -1,0 +1,10 @@
+# etcd 集群间通信的IP和端口, 根据etcd组成员自动生成
+TMP_NODES: "{% for ip in groups['patroni'] %}etcd-{{ ip }}=http://{{ ip }}:2380,{% endfor %}"
+ETCD_NODES: "{{ TMP_NODES.rstrip(',') }}"
+
+ENDPOINTS: "{% for host in groups['patroni'] %}{{ host }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
+
+# etcd 集群初始状态 new/existing
+CLUSTER_STATE: "new"
+
+ETCD_DATA_DIR: "/var/lib/etcd/"

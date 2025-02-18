@@ -1,0 +1,11 @@
+# 镜像名称
+es_image: "elasticsearch-oss:7.4.2"
+oap_image: "skywalking-oap-server:8.8.1"
+ui_image: "skywalking-ui:8.8.1"
+docker_network_name: "sky-tier"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

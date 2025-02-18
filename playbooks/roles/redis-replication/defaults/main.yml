@@ -1,0 +1,19 @@
+# 镜像名称
+container_name: "{%- if inventory_hostname == groups.redis[0] -%} \
+                    redis-master \
+                {%- else -%} \
+                    redis-slave \
+                {%- endif -%}"
+
+container_tag: "7.0.15"
+container_file: "redis_{{ container_tag }}"
+container_image: "redis:{{ container_tag }}"
+docker_network_name: "redis-tier"
+master_ip: "{{ groups.redis[0] }}"
+slave_ip: "{{ groups.redis[1] }}"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

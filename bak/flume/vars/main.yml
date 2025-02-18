@@ -1,0 +1,4 @@
+
+spark_tgz: spark-2.4.8-bin-hadoop2.7.tar.gz
+
+spark_ip: "{{ inventory_hostname }}"

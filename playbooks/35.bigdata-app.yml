@@ -1,0 +1,17 @@
+- hosts:
+    - "{{ groups.doris[-1] }}"
+  roles:
+    - java
+    - bigdata-app
+  gather_facts: false
+  vars:
+    bigdata_app_home: "/data/wshoto-data-platform"
+    # 中间件信息
+    es_ip: "172.18.13.2:9200"
+    es_user: "elastic"
+    es_passwd: "Wshoto!@2024"
+    rocketmq_ip: "172.18.13.16:9876"
+    pg_ip: "172.18.13.2"
+    pg_port: "5432"
+    pg_user: "postgres"
+    pg_passwd: "Wshoto!@2024"

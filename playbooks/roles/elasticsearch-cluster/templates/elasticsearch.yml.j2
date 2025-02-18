@@ -1,0 +1,27 @@
+# 集群名称
+cluster.name: elasticsearch
+# 节点名称
+node.name: {{ nodename }}
+# 数据和日志的存储目录
+path.data: {{ elastic_data_dir }}
+path.logs: {{ elastic_log_dir }}
+# 设置绑定的ip，设置为0.0.0.0以后就可以让任何计算机节点访问到了
+network.host: {{ inventory_hostname }}
+# es http端口
+http.port: {{ elastic_http_port }}
+# es tcp端口
+transport.port: {{ elastic_tcp_port }}
+# 第一次引导集群时使用的参数，作用是用于在生产环境选举符合标准的节点集。新加入的节点请勿使用此项！
+cluster.initial_master_nodes: ["{{ node_ad1 }}","{{ node_ad2 }}","{{ node_ad3 }}"]
+# 此设置提供集群中其他节点的列表，这些节点符合主节点资格，并且可能处于活动状态且可联系以播种发现过程。
+discovery.seed_hosts: ["{{ node_ad1 }}","{{ node_ad2 }}","{{ node_ad3 }}"]
+# 增加新的参数，这样head插件可以访问es
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: elastic-certificates.p12
+xpack.security.transport.ssl.truststore.path: elastic-certificates.p12
+# 是否开启跨域访问
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+script.painless.regex.enabled: true

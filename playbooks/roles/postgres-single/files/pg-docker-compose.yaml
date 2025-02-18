@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  postgresql:
+    image: docker.io/bitnami/postgresql:11
+    container_name: postgresql
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes:
+      - /data/postgresql/data:/bitnami/postgresql
+    environment:
+      # - POSTGRESQL_USERNAME=tbase
+      - POSTGRESQL_PASSWORD=Wshoto!@2024
+      - POSTGRESQL_MAX_CONNECTIONS=2000

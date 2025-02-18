@@ -1,0 +1,12 @@
+- name: 安装glusterfs
+  yum:
+    name: glusterfs,glusterfs-fuse
+    state: present
+
+- name: create mount_dir directory
+  file:
+    path: "{{ mount_dir }}"
+    state: directory
+
+- name: 挂载目录
+  shell: "mount -t glusterfs -o backup-volfile-servers=glusternode02:glusternode03 glusternode01:/brick-data {{ mount_dir }}"

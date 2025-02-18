@@ -1,0 +1,22 @@
+# 镜像名称
+container_name: "{%- if inventory_hostname == groups.redis[0] -%} \
+                    redis-master \
+                {%- else -%} \
+                    redis-slave \
+                {%- endif -%}"
+
+container_sentinel_name: "redis-sentinel"
+
+container_tag: "7.0.15"
+container_file: "redis_{{ container_tag }}"
+container_image: "redis:{{ container_tag }}"
+container_sentinel_file: "redis-sentinel_{{ container_tag }}"
+container_sentinel_image: "redis-sentinel:{{ container_tag }}"
+
+master_ip: "{{ groups.redis[0] }}"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

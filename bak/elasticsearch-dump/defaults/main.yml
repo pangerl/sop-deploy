@@ -1,0 +1,10 @@
+# 镜像名称
+container_name: "elasticsearch-dump"
+container_tag: "v6.28.0"
+container_file: "elasticsearch-dump_{{ container_tag }}"
+container_image: "elasticsearch-dump:{{ container_tag }}"
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

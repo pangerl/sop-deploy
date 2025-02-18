@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  nacos1:
+    container_name: {{ container_name }}
+    image: nacos/{{ container_image }}
+    network_mode: host
+    volumes:
+      - ./cluster-logs/nacos1:/home/nacos/logs
+  #  ports:
+  #    - "7848:7848"
+  #    - "8848:8848"
+  #    - "9868:9848"
+  #    - "9850:9849"
+    environment:
+      - PREFER_HOST_MODE=ip
+      - NACOS_AUTH_ENABLE=true
+      - NACOS_SERVERS={{ groups.nacos[0] }}:8848 {{ groups.nacos[1] }}:8848 {{ groups.nacos[2] }}:8848
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST={{ MYSQL_HOST }}
+      - MYSQL_SERVICE_DB_NAME={{ nacos_db_name }}
+      - MYSQL_SERVICE_PORT={{ MYSQL_PORT }}
+      - MYSQL_SERVICE_USER={{ MYSQL_USER }}
+      - MYSQL_SERVICE_PASSWORD={{ MYSQL_PASSWORD }}
+      - NACOS_AUTH_TOKEN=SecretKey0123456789012345678435847587438758437953748573487543
+      - NACOS_AUTH_IDENTITY_KEY=root
+      - NACOS_AUTH_IDENTITY_VALUE=xxxxxx4
+    restart: always
+ 
+ 
+

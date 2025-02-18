@@ -1,0 +1,29 @@
+
+- name: download nacos-check tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/nacos-check_Linux_x86_64.tar.gz"
+    dest: "/opt"
+
+- name: 添加执行权限
+  shell: "chmod +x nacos-check"
+  args:
+    chdir: "/opt"
+
+- name: Template nacos-check start script
+  template:
+    src: start_nacos-check.sh.j2
+    dest: "/opt/start_nacos-check.sh"
+    mode: 0644
+
+- name: start nacos-check
+  shell: "/bin/bash /opt/start_nacos-check.sh"
+  args:
+    chdir: "/opt"
+
+- name: add nacos-check from /etc/rc.d/rc.local
+  shell: "echo '/bin/bash /opt/start_nacos-check.sh' >> /etc/rc.d/rc.local"
+ 
+- name: nacos-check web
+  debug:
+    msg:
+    - "WEB地址：http://{{ inventory_hostname }}:8099"

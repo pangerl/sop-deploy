@@ -1,0 +1,21 @@
+# 镜像名称
+container_name: "{%- if inventory_hostname == groups.postgres[0] -%} \
+                    pg-0 \
+                {%- else -%} \
+                    pg-1 \
+                {%- endif -%}"
+container_tag: "14.10.0"
+container_file: "postgresql-repmgr_{{ container_tag }}"
+container_image: "postgresql-repmgr:{{ container_tag }}"
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"
+pg_0: "{{ groups.postgres[0] }}"
+pg_1: "{{ groups.postgres[1] }}"
+
+pgpool_container_name: pgpool
+pgpool_container_tag: "4.4.2"
+pgpool_container_file: "pgpool_{{ pgpool_container_tag }}"
+pgpool_container_image: "pgpool:{{ pgpool_container_tag }}"

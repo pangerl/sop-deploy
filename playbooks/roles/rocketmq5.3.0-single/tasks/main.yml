@@ -1,0 +1,74 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ image_dir }}"
+    - "{{ working_dir }}"
+    
+- name: download image
+  copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+  with_items:
+  - "{{ load_mq_image }}"
+  - "{{ load_dashboard_image }}"
+  ignore_errors: true
+
+- name: load image
+  shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+  with_items:
+  - "{{ load_mq_image }}"
+  - "{{ load_dashboard_image }}"
+  ignore_errors: true
+
+
+
+- name: create conf directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ working_dir }}/namesrv/logs"
+    - "{{ working_dir }}/console/logs"
+    - "{{ working_dir }}/broker-a0/conf"
+    - "{{ working_dir }}/broker-a0/logs"
+    - "{{ working_dir }}/broker-a0/store"
+
+- name: copy namesrv.conf file
+  template: src=namesrv.conf.j2 dest={{ working_dir }}/namesrv.conf mode=0755
+
+- name: copy broker-a0.conf 文件
+  template: src=broker-a0.conf.j2 dest={{ working_dir }}/broker-a0.conf mode=0644
+
+- name: copy rmq-proxy0.json 文件
+  template: src=rmq-proxy0.json.j2 dest={{ working_dir }}/rmq-proxy0.json mode=0644
+
+- name: copy users.properties 文件
+  template: src=users.properties dest={{ working_dir }}/users.properties mode=0755
+
+- name: copy docker-compose-namesrv.yml file
+  template: src=docker-compose-namesrv.yml.j2 dest={{ working_dir }}/docker-compose-namesrv.yml mode=0755
+
+- name: copy docker-compose-brokera0.yml file
+  template: src=docker-compose-brokera0.yml.j2 dest={{ working_dir }}/docker-compose-brokera0.yml mode=0755
+
+- name: copy docker-compose-console.yml file
+  template: src=docker-compose-console.yml.j2 dest={{ working_dir }}/docker-compose-console.yml mode=0755
+
+- name: owner working_dir directory
+  file:
+    path: "{{ working_dir }}"
+    state: directory
+    mode: 0755
+    owner: "3000"
+    group: "3000"
+    recurse: "yes"
+
+- name: create namesrv container
+  shell: docker-compose -f {{ working_dir }}/docker-compose-namesrv.yml up -d
+
+- name: create brokera0 container
+  shell: docker-compose -f {{ working_dir }}/docker-compose-brokera0.yml up -d
+
+- name: create dashboard container
+  shell: docker-compose -f {{ working_dir }}/docker-compose-console.yml up -d

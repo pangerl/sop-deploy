@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  mysql-master:
+    image: bitnami/{{ container_image }}
+    container_name: {{ container_name }}
+    restart: always
+    shm_size: 1g
+    ports:
+      - "{{ mysql_port }}:3306"
+    volumes:
+      - "{{ working_dir }}/data:/bitnami/mysql/data"
+    environment:
+      - MYSQL_ROOT_PASSWORD={{ mysql_password }}

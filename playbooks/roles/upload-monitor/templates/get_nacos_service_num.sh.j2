@@ -1,0 +1,42 @@
+#!/bin/bash
+#填写应用节点数
+gateway_pre_num=1
+mall_pre_num=1
+apps_pre_num=1
+conversation_pre_num=1
+base_pre_num=1
+uaa_pre_num=1
+marketing_pre_num=1
+
+
+count=`curl -s -X GET 'http://{{ nacos_ip_port }}/nacos/v1/ns/service/list?pageNo=1&pageSize=20&username={{ nacos_user }}&password={{ nacos_password }}&namespaceId={{ namespaceId }}' | awk -F "count" '{print $2}'  | cut -b 3`
+echo "nacos_service num="$count""
+
+gateway_count=`curl -s -X GET 'http://{{ nacos_ip_port }}/nacos/v1/ns/instance/list?serviceName=wshoto-gateway&username={{ nacos_user }}&password={{ nacos_password }}&namespaceId={{ namespaceId }}&healthyOnly=true' |grep -o instanceId |wc -l`
+echo "nacos_service gateway_num="${gateway_count}""
+
+mall_count=`curl -s -X GET 'http://{{ nacos_ip_port }}/nacos/v1/ns/instance/list?serviceName=wshoto-bigapp-mall&username={{ nacos_user }}&password={{ nacos_password }}&namespaceId={{ namespaceId }}&healthyOnly=true' |grep -o instanceId |wc -l`
+echo "nacos_service mall_num="${mall_count}""
+
+apps_count=`curl -s -X GET 'http://{{ nacos_ip_port }}/nacos/v1/ns/instance/list?serviceName=bigdata-apps-server&username={{ nacos_user }}&password={{ nacos_password }}&namespaceId={{ namespaceId }}&healthyOnly=true' |grep -o instanceId |wc -l`
+echo "nacos_service apps_num="${apps_count}""
+
+conversation_count=`curl -s -X GET 'http://{{ nacos_ip_port }}/nacos/v1/ns/instance/list?serviceName=wshoto-bigapp-conversation&username={{ nacos_user }}&password={{ nacos_password }}&namespaceId={{ namespaceId }}&healthyOnly=true' |grep -o instanceId |wc -l`
+echo "nacos_service conversation_num="${conversation_count}""
+
+base_count=`curl -s -X GET 'http://{{ nacos_ip_port }}/nacos/v1/ns/instance/list?serviceName=wshoto-bigapp-base&username={{ nacos_user }}&password={{ nacos_password }}&namespaceId={{ namespaceId }}&healthyOnly=true' |grep -o instanceId |wc -l`
+echo "nacos_service base_num="${base_count}""
+
+uaa_count=`curl -s -X GET 'http://{{ nacos_ip_port }}/nacos/v1/ns/instance/list?serviceName=wshoto-bigapp-uaa&username={{ nacos_user }}&password={{ nacos_password }}&namespaceId={{ namespaceId }}&healthyOnly=true' |grep -o instanceId |wc -l`
+echo "nacos_service uaa_num="${uaa_count}""
+
+marketing_count=`curl -s -X GET 'http://{{ nacos_ip_port }}/nacos/v1/ns/instance/list?serviceName=wshoto-bigapp-marketing&username={{ nacos_user }}&password={{ nacos_password }}&namespaceId={{ namespaceId }}&healthyOnly=true' |grep -o instanceId |wc -l`
+echo "nacos_service marketing_num="${marketing_count}""
+
+echo "nacos_service  gateway_pre_num=${gateway_pre_num}"
+echo "nacos_service  mall_pre_num=${mall_pre_num}"
+echo "nacos_service  apps_pre_num=${apps_pre_num}"
+echo "nacos_service  conversation_pre_num=${conversation_pre_num}"
+echo "nacos_service  base_pre_num=${base_pre_num}"
+echo "nacos_service  uaa_pre_num=${uaa_pre_num}"
+echo "nacos_service  marketing_pre_num=${marketing_pre_num}"

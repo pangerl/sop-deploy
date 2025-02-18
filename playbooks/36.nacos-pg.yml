@@ -1,0 +1,14 @@
+- name: 部署 nacos
+  hosts:
+    - nacos
+  roles:
+  - { role: nacos-pg-single, when: "NACOS_MODEL == 'single'" }
+  - { role: nacos-pg-cluster, when: "NACOS_MODEL == 'cluster'" }
+  gather_facts: false
+  vars:
+    PG_HOST: "{{ groups.postgres[0] }}"
+    PG_PORT: 5432
+    PG_USER: "postgres"
+    PG_PASSWORD: "Wshoto!@2024"
+    nacos_db_name: "nacos_config"
+    working_dir: "/data/nacos"

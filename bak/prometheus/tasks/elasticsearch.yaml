@@ -1,0 +1,26 @@
+
+- name: download elasticsearch_package tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/{{ elasticsearch_package }}"
+    dest: "{{ data_root_dir }}"
+    creates: "{{ data_root_dir }}/{{ elasticsearch_package.split('.t')[0] }}"
+
+- name: 配置 elasticsearch_exporter 软链接
+  file: 
+    src: "{{ data_root_dir }}/{{ elasticsearch_package.split('.t')[0] }}"
+    dest: "{{ elasticsearch_dir }}"
+    state: link
+    force: yes
+  ignore_errors: true
+
+- name: Template elasticsearch_exporter systemd service file
+  template:
+    src: elasticsearch_exporter.service.j2
+    dest: "{{ elasticsearch_unit_path }}"
+    mode: 0644
+
+- name: Start the elasticsearch_exporter service
+  systemd:
+    name: elasticsearch_exporter.service
+    state: started
+    enabled: yes

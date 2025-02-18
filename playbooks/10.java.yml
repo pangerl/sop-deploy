@@ -1,0 +1,6 @@
+- name: 部署 java
+  hosts:
+    - n9e
+  roles:
+    - java
+  gather_facts: false

@@ -1,0 +1,57 @@
+# [optional] to synchronize system time of nodes with 'chrony' 
+- hosts:
+  - k8s
+  - node
+  roles:
+  - chrony
+
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+  - { role: nginx, when: "LOCAL_YUM" }
+  - java
+  vars:
+    NG_MODEL: "yum"
+    ansible_python_interpreter: /usr/bin/python
+
+  tasks:
+    # - name: 获取是否已经安装 mysql-client
+    #   shell: 'which mysql || echo "NoFound"'
+    #   register: is_mysql
+
+    # - block:
+      # - name: download rpm
+      #   unarchive:
+      #     src: "{{ project_dir }}/packages/binary_tag/mysql-client.tgz"
+      #     dest: /tmp
+      #     creates: /tmp/mysql-client
+
+      # - name: install mysql-client
+      #   shell: rpm -Uvh ./*.rpm --nodeps --force
+      #   args:
+      #     chdir: /tmp/mysql-client
+      # when: "'NoFound' in is_mysql.stdout"
+
+    - name: 获取是否已经安装 pg-client
+      shell: 'which psql || echo "NoFound"'
+      register: is_pg
+
+    - block:
+      - name: download rpm
+        unarchive:
+          src: "{{ project_dir }}/packages/binary_tag/postgresql14.tgz"
+          dest: /tmp
+          creates: /tmp/postgresql14
+
+      - name: install pg-client
+        shell: rpm -Uvh ./*.rpm --nodeps --force
+        args:
+          chdir: /tmp/postgresql14
+      when: "'NoFound' in is_pg.stdout"
+
+# prepare tasks for all nodes
+- hosts:
+  - node
+  roles:
+  - prepare

@@ -1,0 +1,7 @@
+# to install a container runtime
+- hosts:
+  - middle
+  roles:
+    - docker
+  vars:
+    # ansible_python_interpreter: /usr/bin/python2

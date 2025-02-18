@@ -1,0 +1,20 @@
+---
+kafka_unit_path: /usr/lib/systemd/system/kafka.service
+
+kafka_zookeeper_connect: "{{ groups.kafka[0] }}:{{ zookeeper_client_port }},{{ groups.kafka[1] }}:{{ zookeeper_client_port }},{{ groups.kafka[2] }}:{{ zookeeper_client_port }}"
+
+kafka_connect_bootstrap_servers: "{{ groups.kafka[0] }}:{{ kafka_port }},{{ groups.kafka[1] }}:{{ kafka_port }},{{ groups.kafka[2] }}:{{ kafka_port }}"
+
+kafka_producer_bootstrap_servers: "{{ kafka_connect_bootstrap_servers }}"
+
+kafka_consumer_bootstrap_servers: "{{ kafka_connect_bootstrap_servers }}"
+
+kafka_ip: "{{ inventory_hostname }}"
+
+kafka_broker_id: "{%- if inventory_hostname == groups.kafka[0] -%} \
+                    1 \
+                {%- elif inventory_hostname == groups.kafka[1] -%} \
+                    2 \
+                {%- else -%} \
+                    3 \
+                {%- endif -%}"

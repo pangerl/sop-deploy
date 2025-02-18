@@ -1,0 +1,80 @@
+- name: 获取是否已经安装 java
+  shell: 'which java || echo "NoFound"'
+  register: is_jdk
+
+- block:
+  
+  - name: remove java package
+    shell:  rpm -qa | grep "^java" | xargs 
+    # become: yes
+    # become_user: "{{ remote_user }}"
+    register: java_packages
+
+  - name: debug
+    debug: msg={{ java_packages.stdout_lines }}
+
+  #- name: set facts
+  #  set_fact: java_packages="{{ java_packages.stdout.split(' ') }}"
+
+  - name: remove java
+    yum: 
+      name: "{{ item }}"
+      state: absent
+    with_items: "{{ java_packages.stdout.split(' ') }}"
+    vars:
+      ansible_python_interpreter: /usr/bin/python3
+    ignore_errors: True
+
+  when: is_jdk.rc == 0
+
+
+- block:
+  - name: download tag
+    unarchive:
+      src: "{{ project_dir }}/packages/binary_tag/{{ jdk_tgz }}"
+      dest: /opt
+      creates: "{{ jdk_dir }}"
+      # creates: "/opt/{{ jdk_name.split('.')[0] }}"
+
+  - name: 配置 jdk 软链接
+    file: 
+      src: "{{ jdk_dir }}"
+      dest: "{{ JAVA_HOME }}"
+      state: link
+      force: yes
+    ignore_errors: true
+
+  - name: ensure /etc/profile.d exists
+    file:
+      path: /etc/profile.d
+      state: directory
+      owner: root
+      group: root
+      mode: 'u=rwx,go=rx'
+
+  - name: export JAVA_HOME and add to PATH
+    template:
+      src: java.sh.j2
+      dest: /etc/profile.d/java.sh
+      owner: root
+      group: root
+      mode: 'u=rw,go=r'
+
+  - name: config java from .bashrc
+    blockinfile:
+      path: /root/.bashrc
+      marker: "# {mark} jdk "
+      insertafter: "^alias mv='mv -i'"
+      block: |
+        export JAVA_HOME={{ JAVA_HOME }}
+        export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+        export PATH=$JAVA_HOME/bin:$PATH
+
+  - name: 使环境变量生效
+    shell: source /root/.bashrc
+    ignore_errors: true
+
+  when: "'NoFound' in is_jdk.stdout"
+
+- name: test java version
+  shell: /opt/java/bin/java -version

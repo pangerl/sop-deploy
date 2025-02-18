@@ -1,0 +1,13 @@
+- name: 部署 fastdfs
+  hosts:
+  - fastdfs
+  roles:
+  - { role: fastdfs-single, when: "FAST_MODEL == 'single'" }
+  - { role: fastdfs-cluster, when: "FAST_MODEL == 'cluster'"}
+  gather_facts: false
+  vars:
+    working_dir: "/data/fastdfs"
+    # tracker_port: 22122
+    # storage_port: 23000
+    # nginx_port: 8080
+

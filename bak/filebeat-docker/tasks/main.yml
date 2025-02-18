@@ -1,0 +1,39 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_image }} dest={{ image_dir }}/{{ container_image }} mode=0644
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_image }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- name: remove container
+  docker_container:
+    name: "{{ container_name }}"
+    state: absent
+
+- name: Template configuration file to filebeat.yml
+  template:
+    src: filebeat.yml.j2
+    dest: /data/filebeat.yml
+
+- name: create container
+  docker_container:
+    name: "{{ container_name }}"
+    image: "elastic/{{ container_image }}"
+    pull: "{{ pull }}"
+    user: "root"
+    volumes:
+      - "{{ working_dir }}:/data/wshoto"
+      - "/data/filebeat.yml:/usr/share/filebeat/filebeat.yml"   
+    state: started    
+    restart_policy: always

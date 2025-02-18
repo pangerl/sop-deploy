@@ -1,0 +1,97 @@
+- name: Set the hostname
+  hostname:
+    name: "{{ hostvars[inventory_hostname].hostname }}"
+
+- name: Gather IP and Hostname information
+  set_fact:
+    host_info_list: "{{ host_info_list | default([]) + [{ 'ip': item, 'hostname': hostvars[item].hostname }] }}"
+  loop: "{{ groups['patroni'] }}"
+
+- name: Update /etc/hosts with IP and hostname mappings
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ item.ip }} {{ item.hostname }}"
+    state: present
+  loop: "{{ host_info_list }}"
+
+- name: 下载安装包
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/patroni.tgz"
+    dest: /tmp
+    creates: /tmp/patroni
+
+- name: Install postgresql14
+  shell: yum localinstall -y *.rpm
+  args:
+    chdir: /tmp/patroni/postgresql14
+
+- name: Install postgis
+  shell: yum localinstall -y *.rpm
+  args:
+    chdir: /tmp/patroni/postgis
+
+- name: 创建数据目录
+  file:
+    path: "{{ data_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: 0755
+
+- name: 配置Patroni配置文件
+  template:
+    src: patroni.yml.j2
+    dest: /data/pgsql/patroni.yml
+    owner: postgres
+    group: postgres
+    mode: 0644
+
+- name: install python3.8
+  command: mv /tmp/patroni/python3.8 /opt/python3.8
+  args:
+    creates: /opt/python3.8
+
+- name: 设置环境变量
+  lineinfile:
+    path: /etc/profile
+    line: |
+      PATH=/opt/python3.8/bin:$PATH
+      PATH=/opt/python3.8/lib/python3.8/site-packages/bin:$PATH
+    create: yes
+
+- name: 使环境变量生效
+  shell: source /etc/profile
+  args:
+    executable: /bin/bash
+
+- name: 创建patroni的systemd unit文件
+  template: src=patroni.service.j2 dest=/etc/systemd/system/patroni.service
+
+- name: Start the patroni service
+  systemd:
+    name: patroni.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: 以轮询的方式等待服务同步完成
+  shell: "systemctl is-active patroni.service"
+  register: patroni_status
+  until: '"active" in patroni_status.stdout'
+  retries: 8
+  delay: 8
+
+- name: Install haproxy
+  shell: yum localinstall -y *.rpm
+  args:
+    chdir: /tmp/patroni/haproxy
+
+- name: 创建 haproxy 的配置文件
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg
+
+- name: 启动 haproxy 服务
+  systemd:
+    name: haproxy
+    state: started
+    enabled: yes
+    daemon_reload: yes

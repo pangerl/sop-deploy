@@ -1,0 +1,26 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /data/wshoto/event/logs/*.log
+    fields:
+      log_topic: topic-event
+    include_lines: ['#EVENT-CDH@']
+    exclude_files: ['host','agent','input','ecs']
+  - type: log
+    enabled: true
+    paths:
+      - /data/wshoto/access/logs/*.log
+    fields:
+      log_topic: topic-access
+    exclude_files: ['host','agent','input','ecs']  
+output.kafka:
+  enabled: true
+  hosts: ["{{ kafka_ip }}:9092"]
+  topic: '%{[fields][log_topic]}'
+  compression: none
+  partition.round_robin:
+    reachable_only: true
+    worker: 10
+    required_acks: 1
+logging.level: info

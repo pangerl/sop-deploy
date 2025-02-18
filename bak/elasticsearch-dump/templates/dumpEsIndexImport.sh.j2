@@ -1,0 +1,23 @@
+#!bin/bash
+set -o nounset
+
+ip="{{ es_ip }}"
+username="{{ es_user }}"
+password="{{ es_password }}"
+
+workdir=$(cd "$(dirname "$0")" || exit; pwd)
+
+cd $workdir/
+
+if [ ! -f "index.txt" ]; then
+echo "index.txt 不存在！"
+fi
+cat index.txt|while read line
+do
+index_name=`echo $line |awk '{print $1}'`
+echo "开始执行索引:$index_name"
+input="http://$username:$password@$ip:9200/$index_name"
+elasticdump --input=$workdir/$index_name"_settings".json --output=$input  --type=settings
+elasticdump --input=$workdir/$index_name.json --output=$input --type=mapping
+echo "索引"$index_name"执行完毕"
+done

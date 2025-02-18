@@ -1,0 +1,32 @@
+
+- name: download rpm 
+  copy: src={{ project_dir }}/packages/binary_tag/monitor/{{ item }} dest=/tmp/{{ item }} mode=0644
+  with_items:
+    - "{{ telegraf_rpm }}"
+
+- name: install telegraf rpm from a local file
+  yum:
+    name: "{{ item  }}"
+    state: present
+  loop:
+    - "/tmp/{{ telegraf_rpm }}"
+
+- name: delete file telegraf.conf
+  file:
+    path: /etc/telegraf/telegraf.conf
+    state: absent
+
+- name: Template configuration file to telegraf.conf
+  template:
+    src: telegraf.conf.j2
+    dest: /etc/telegraf/telegraf.conf
+
+- name: copy base.conf
+  copy: src=base.conf dest=/etc/telegraf/telegraf.d/base.conf mode=0644
+
+- name: Enable service telegraf, and not touch the state
+  service:
+    name: telegraf
+    state: started
+    enabled: yes
+  ignore_errors: true

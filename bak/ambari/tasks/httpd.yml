@@ -1,0 +1,22 @@
+- name: 获取是否已经安装 httpd
+  shell: 'which httpd || echo "NoFound"'
+  register: is_httpd
+
+- block:
+  - name: download rpm
+    unarchive:
+      src: "{{ project_dir }}/packages/binary_tag/httpd.tgz"
+      dest: /tmp
+      creates: /tmp/httpd
+
+  - name: install httpd
+    shell: rpm -Uvh ./*.rpm --nodeps --force
+    args:
+      chdir: /tmp/httpd
+  when: "'NoFound' in is_httpd.stdout"
+
+- name: Enable service httpd, and not touch the state
+  service:
+    name: httpd
+    state: started
+    enabled: yes

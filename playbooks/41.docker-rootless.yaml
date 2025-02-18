@@ -1,0 +1,9 @@
+- name: 部署 docker-rootless
+  hosts:
+    - docker
+  roles:
+    - docker-rootless
+  gather_facts: false
+  vars:
+    working_dir: "/data/docker"
+    run_user: "pangu3"

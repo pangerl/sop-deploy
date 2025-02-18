@@ -1,0 +1,37 @@
+- name: download categraf tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/{{ categraf_tgz }}"
+    dest: "/opt"
+    creates: "/opt/{{ categraf_tgz.split('.t')[0] }}"
+
+- name: 配置 categraf 软链接
+  file: 
+    src: "/opt/{{ categraf_tgz.split('.t')[0] }}"
+    dest: "{{ categraf_dir }}"
+    state: link
+    force: yes
+  ignore_errors: true
+
+- name: Template categraf config file
+  template:
+    src: config.toml.j2
+    dest: "{{ categraf_dir }}/conf/config.toml"
+    mode: 0644
+
+- name: Template categraf systemd service file
+  template:
+    src: categraf.service.j2
+    dest: "{{ categraf_unit_path }}"
+    mode: 0644
+
+- name: Template categraf disk.toml config file
+  template:
+    src: disk.toml.j2
+    dest: "{{ categraf_dir }}/conf/input.disk/disk.toml"
+    mode: 0644
+
+- name: Start the categraf service
+  systemd:
+    name: categraf.service
+    state: started
+    enabled: yes

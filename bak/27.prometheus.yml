@@ -1,0 +1,29 @@
+- name: 部署 prometheus
+  hosts:
+    - prometheus
+  roles:
+    - prometheus
+  gather_facts: false
+  vars:
+    data_root_dir: "/data"
+    prometheus_port: 9090
+    prometheusalert_ip: "{{ local_ip }}"
+    webhook_key: "{{ sop_key }}"
+
+    # 项目名称(重要)
+    project: "sop"
+    # prometheus 模式，默认agent远程写模式
+    # server模式开关
+    server_enabled: false
+    # 组件开关, true | false
+    # blackbox_exporter
+    blackbox_enabled: true
+    # nacos-check
+    nacos_enabled: true
+    nacos_url: "172.18.1.9:8848"
+    nacos_pw: "nacos"
+    # elasticsearch_exporter
+    es_enabled: false
+    es_url: "{{ es_ip }}:9200"
+    es_user: "elastic"
+    es_password: "xxxxxx2"

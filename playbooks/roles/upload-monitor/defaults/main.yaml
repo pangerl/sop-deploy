@@ -1,0 +1,10 @@
+categraf_dir: "/opt/categraf"
+n9e_url: "{{ groups.n9e[0] }}:17000"
+writers_url: "http://{{ n9e_url }}/prometheus/v1/write"
+# es 
+TMP_ES_SERVERS: '{% for es in groups.es -%}"http://{{ es }}:9200",{% else %}"http://{{ es_ip }}:9200"{%- endfor %}'
+ES_SERVERS: "{{ TMP_ES_SERVERS.rstrip(',') }}"
+# kafka
+TMP_KAFKA_SERVERS: '{% for ip in groups.kafka -%}"{{ ip }}:9092",{% else %}"{{ kafka_ip }}:9092"{%- endfor %}'
+KAFKA_SERVERS: "{{ TMP_KAFKA_SERVERS.rstrip(',') }}"
+

@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  rocketmq-dashboard:
+    image: {{ dashboard_image }}
+    container_name: rocketmq-dashboard
+    ports:
+      - "8081:8080"
+    network_mode: bridge
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - {{ working_dir }}/console/logs:/root/logs
+      - {{ working_dir }}/users.properties:/tmp/rocketmq-console/data/users.properties
+    environment:
+      - JAVA_OPTS=-Drocketmq.namesrv.addr={{ namesrvAddr }} -Dcom.rocketmq.sendMessageWithVIPChannel=false -Dlogging.level.root=off -Drocketmq.config.loginRequired=true
+      - OPTS=--rocketmq.config.namesrvAddrs={{ namesrvAddr }}
+    restart: always

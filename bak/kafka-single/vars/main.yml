@@ -1,0 +1,13 @@
+
+kafka_ip: "{{ inventory_hostname }}"
+kafka_image: kafka:2.13-2.8.1
+zookeeper_image: zookeeper:latest
+
+kafka_name: kafka
+zookeeper_name: zookeeper
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

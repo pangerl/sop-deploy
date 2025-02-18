@@ -1,0 +1,34 @@
+
+- name: download rpm 
+  copy: src={{ project_dir }}/packages/binary_tag/monitor/{{ item }} dest=/tmp/{{ item }} mode=0644
+  with_items:
+    - "{{ grafana_rpm }}"
+
+- name: install grafana rpm from a local file
+  yum:
+    name: "{{ item  }}"
+    state: present
+  loop:
+    - "/tmp/{{ grafana_rpm }}"
+
+- name: Create plugins for grafana
+  file:
+    path: "/var/lib/grafana/plugins"
+    state: directory
+    group: "grafana"
+    owner: "grafana"
+    mode: 0755
+
+- name: 解压 grafana-piechart
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/grafana-piechart-panel-1.6.4.any.zip"
+    dest: /var/lib/grafana/plugins
+    group: "grafana"
+    owner: "grafana"
+
+- name: Enable service grafana, and not touch the state
+  service:
+    name: grafana-server
+    state: started
+    enabled: yes
+  ignore_errors: true

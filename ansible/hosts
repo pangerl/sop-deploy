@@ -1,0 +1,62 @@
+[k8s]
+
+# 全部中间件
+[middle]
+
+# 大应用
+[big-app]
+
+# 大数据
+#支持集群（三台）&单点部署（一台）
+[doris]
+
+# 下面定义具体服务的部署机器
+# 主从2台
+[redis]
+[postgres]
+[mysql]
+# 集群配置2台
+[delay]
+[fastdfs]
+[xxl_job]
+[nacos]
+# 集群配置3台
+[rocketmq]
+[kafka]
+# kafdrop是kafka的web管理工具，不需要就留空
+[kafdrop]
+[es]
+# kibana是es的web管理工具，不需要就留空
+[kibana]
+# 单节点
+[nginx]
+[kuboard]
+[skywalking]
+[harbor]
+# 监控服务器
+[prometheus]
+[n9e]
+[n9e_edge]
+
+# PG高可用集群
+[patroni]
+172.17.83.2 hostname=node1
+172.17.83.8 hostname=node2
+172.17.83.12 hostname=node3
+
+# 这一行不用配置
+[node:children]
+doris
+middle
+big-app
+
+[all:vars]
+ansible_ssh_user=xxx
+ansible_ssh_pass=xxx
+ansible_ssh_port=22
+ansible_become=true
+ansible_become_method=sudo
+# 信创麒麟指定python3
+# ansible_python_interpreter=/usr/bin/python3
+# sudo 提权需要密码时设置
+# ansible_become_pass=xxx

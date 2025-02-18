@@ -1,0 +1,56 @@
+groups:
+
+- name: hostStatsAlert
+  rules:
+  - alert: "主机告警"
+    expr: up{job="telegraf"} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Node {{ $labels.instance }} is down"
+      description: "Failed to scrape {{ $labels.job }} on {{ $labels.instance }} for more than 5 minutes"
+      value: "{{ $value }}"
+
+- name: memory 
+  rules:
+  - alert: "系统可用内存不足告警"
+    expr: mem_used_percent{job="telegraf"} > 85
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "系统内存使用率大于85%"
+      description: "系统内存使用率大于85%"
+      value: "{{ $value }}"
+
+- name: disk
+  rules:
+  - alert: "磁盘空间告警"
+    expr: disk_used_percent{job="telegraf", path="/data"} > 80 or disk_used_percent{job="telegraf", path="/"} > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "磁盘可用空间不足20%"
+      description: "主机 {{ $labels.hostname }} 的 {{ $labels.device }} 磁盘可用空间为 {{ $value }}"
+
+- name: cpu
+  rules:
+  - alert: "CPU负载大于Cores"
+    expr: system_load5{job="telegraf"} > system_n_cpus{job="telegraf"}
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "5分钟CPU负载大于Cores"
+      description: "主机 {{ $labels.hostname }} 的cpu负载为 {{ $value }}"
+
+  - alert: cpu使用率大于88%
+    expr: sum by (instance) (100-cpu_usage_idle{job="telegraf", cpu="cpu-total"}) > 88
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "cpu使用率大于85%"
+      description: "主机 {{ $labels.hostname }} 的cpu使用率为 {{ $value | humanize }}"

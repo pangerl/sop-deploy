@@ -1,0 +1,18 @@
+load_mq_image: "rocketmq_5.3.0"
+load_dashboard_image: "rocketmq-dashboard:1.0.0"
+mq_image: "apache/rocketmq:5.3.0"
+dashboard_image: "apacherocketmq/rocketmq-dashboard:1.0.0"
+namesrv_ip_1: "{{ groups.rocketmq[0] }}"
+namesrv_ip_2: "{{ groups.rocketmq[1] }}"
+namesrv_ip_3: "{{ groups.rocketmq[2] }}"
+controllerDLegerPeers: "n0-{{ namesrv_ip_1 }}:9877;n1-{{ namesrv_ip_2 }}:9877;n2-{{ namesrv_ip_3 }}:9877"
+controllerDLegerSelfId: "{%- if inventory_hostname == groups.rocketmq[0] -%} \
+                n0 \
+              {%- elif inventory_hostname == groups.rocketmq[1] -%} \
+                n1 \
+              {%- else -%} \
+                n2 \
+              {%- endif -%}"
+namesrvAddr: "{{ namesrv_ip_1 }}:9876;{{ namesrv_ip_2 }}:9876;{{ namesrv_ip_3 }}:9876"
+controllerAddr: "{{ namesrv_ip_1 }}:9877;{{ namesrv_ip_2 }}:9877;{{ namesrv_ip_3 }}:9877"
+java_opt: "-server -Xms{{ broker_jvm_mx }} -Xmx{{ broker_jvm_ms }} -Xmn{{ broker_jvm_mn }}"

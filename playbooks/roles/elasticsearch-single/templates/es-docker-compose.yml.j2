@@ -1,0 +1,39 @@
+version: '3.7'
+services:
+  elasticsearch:
+    image: {{ es_image }}
+    container_name: {{ es_name }}
+    restart: always
+    environment:
+      - xpack.security.enabled=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms{{ jvm_mem }} -Xmx{{ jvm_mem }}"
+      - TAKE_FILE_OWNERSHIP=true
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - {{ working_dir }}/elasticsearch-data:/usr/share/elasticsearch/data
+      - {{ working_dir }}/elasticsearch-logs:/usr/share/elasticsearch/logs
+      - {{ working_dir }}/elasticsearch-plugins:/usr/share/elasticsearch/plugins
+    ports:
+      - {{ es_http_port }}:9200
+      - {{ es_tcp_port }}:9300
+
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:7.17.19
+#    container_name: kibana
+#    restart: always
+#    ports:
+#      - {{ kibana_port }}:5601
+#    volumes:
+#      - {{ working_dir }}/kibana.yml:/usr/share/kibana/config/kibana.yml 
+#    depends_on:
+#      - "elasticsearch"

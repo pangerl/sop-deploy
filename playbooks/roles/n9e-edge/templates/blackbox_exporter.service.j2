@@ -1,0 +1,12 @@
+[Unit]
+Description=blackbox_exporter
+After=network.target
+
+[Service]
+User=root
+Type=simple
+ExecStart={{ blackbox_dir }}/blackbox_exporter --config.file={{ blackbox_dir }}/blackbox.yml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

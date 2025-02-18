@@ -1,0 +1,141 @@
+- name: hdp common
+  hosts:
+    - hdp
+  roles:
+  - java
+  vars:
+    remote_user: "{{ ansible_ssh_user }}"
+    hdp101: "{{ groups.hdp[0] }}"
+    hdp102: "{{ groups.hdp[1] }}"
+    hdp103: "{{ groups.hdp[2] }}"
+    HOSTNAME: "{%- if inventory_hostname == groups.hdp[0] -%}
+              hdp101
+          {%- elif inventory_hostname == groups.hdp[1] -%}
+              hdp102
+          {%- else -%}
+              hdp103
+          {%- endif -%}"    
+  tasks:
+    - name: Add mappings to /etc/hosts
+      blockinfile:
+        path: /etc/hosts
+        marker: "# {mark} hdp"
+        block: |
+          {{ hdp101 }} hdp101
+          {{ hdp102 }} hdp102
+          {{ hdp103 }} hdp103
+
+    - name: add THP from /etc/rc.d/rc.local
+      blockinfile:
+        path: /etc/rc.d/rc.local
+        mode: 755
+        marker: "# {mark}"
+        insertafter: '^touch'
+        block: |
+          if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+                  echo never > /sys/kernel/mm/transparent_hugepage/enabled
+          fi
+          if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+                  echo never > /sys/kernel/mm/transparent_hugepage/defrag
+          fi
+
+    - block:
+      - name: create ssh keys
+        command: ssh-keygen -t rsa -C "{{ hdp101 }}" -P "" -f ~/.ssh/id_rsa
+        become: yes
+        become_user: "{{ remote_user }}"
+        args:
+          creates: ~/.ssh/id_rsa
+
+      - name: get id_rsa.pub
+        shell: cat ~/.ssh/id_rsa.pub
+        become: yes
+        become_user: "{{ remote_user }}"
+        register: id_rsa_pub
+
+      - name: set facts
+        set_fact: id_rsa_pub={{ id_rsa_pub.stdout }}
+      when: "inventory_hostname == hdp101"
+
+    - name: Register '~/.ssh/authorized_keys' status
+      stat:
+        path: '~/.ssh/authorized_keys'
+      register: is_authorized_keys
+      become: yes
+      become_user: "{{ remote_user }}"
+
+    - name: Create .ssh
+      file:
+        path: '~/.ssh'
+        state: directory
+        group: "{{ remote_user }}"
+        owner: "{{ remote_user }}"
+        mode: 0700
+      become: yes
+      become_user: "{{ remote_user }}"
+      when: not is_authorized_keys.stat.exists
+
+    - name: Create authorized_keys
+      file:
+        path: '~/.ssh/authorized_keys'
+        state: touch
+        group: "{{ remote_user }}"
+        owner: "{{ remote_user }}"
+        mode: 0600
+      become: yes
+      become_user: "{{ remote_user }}"
+      when: not is_authorized_keys.stat.exists
+
+    - name: add id_rsa.pub
+      lineinfile:
+        dest: ~/.ssh/authorized_keys
+        state: present
+        insertafter: 'EOF'
+        regexp: "{{ hdp101 }}$"
+        line: "{{ hostvars[groups.hdp[0]]['id_rsa_pub'] }}"
+      become: yes
+      become_user: "{{ remote_user }}"
+
+    - name: Set a hostname
+      hostname:
+        name: "{{ HOSTNAME }}"
+        use: systemd
+
+- name: ambari server
+  hosts:
+    - "{{ groups.hdp[0] }}"
+  roles:
+  - ambari
+  vars:
+    MYSQL_HOST: "{{ groups.mysql[0] }}"
+    MYSQL_PORT: 3306
+    MYSQL_USER: "root"
+    MYSQL_PASSWORD: "xxxxxx"
+
+- name: 同步 repo
+  hosts:
+    - hdp[1:]
+  gather_facts: false
+  tasks:
+    - name: Template ambari.repo file to /etc/yum.repos.d/
+      copy:
+        src: ambari.repo
+        dest: /etc/yum.repos.d/ambari.repo
+
+    - name: Template HDP.repo file to /etc/yum.repos.d/
+      copy:
+        src: HDP.repo
+        dest: /etc/yum.repos.d/HDP.repo
+
+    - name: Template libtirpc.repo file to /etc/yum.repos.d/
+      copy:
+        src: libtirpc.repo
+        dest: /etc/yum.repos.d/libtirpc.repo
+
+    - name: Update cache
+      yum:
+        update_cache: yes
+
+    - name: Repolist
+      shell: yum repolist
+      ignore_errors: true

@@ -1,0 +1,25 @@
+---
+# Installation variables
+# https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.17.19-linux-x86_64.tar.gz
+elastic_version: 7.17.19
+elastic_package: elasticsearch-{{ elastic_version }}-linux-x86_64.tar.gz
+
+elastic_create_user_group: true
+elastic_group: elastic
+elastic_user: elastic
+
+elastic_root_dir: /opt
+elastic_install_dir: '{{ elastic_root_dir }}/elastic-{{ elastic_version }}'
+# The elastic_dir is created as a symlik to the actual installation directory.
+# All other configuration and variables use the symlinked directory.
+elastic_dir: '{{ elastic_root_dir }}/elastic'
+elastic_log_dir: '{{ elastic_dir }}/log'
+elastic_data_dir: '{{ elastic_dir }}/data'
+
+# Start elastic after installation
+elastic_start: yes
+# Restart elastic on configuration change
+elastic_restart: yes
+
+elastic_http_port: 9200
+elastic_tcp_port: 9300

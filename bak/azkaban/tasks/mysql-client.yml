@@ -1,0 +1,18 @@
+- name: 获取是否已经安装 mysql-client
+  shell: 'which mysql || echo "NoFound"'
+  register: is_mysql
+
+- block:
+
+  - name: download rpm
+    unarchive:
+      src: "{{ project_dir }}/packages/binary_tag/mysql-client.tgz"
+      dest: /tmp
+      creates: /tmp/mysql-client
+
+  - name: install mysql-client
+    shell: rpm -Uvh ./*.rpm --nodeps --force
+    args:
+      chdir: /tmp/mysql-client
+
+  when: "'NoFound' in is_mysql.stdout"

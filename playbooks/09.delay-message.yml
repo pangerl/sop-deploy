@@ -1,0 +1,29 @@
+- name: 部署 delay-message
+  hosts:
+    - delay
+  roles:
+    - { role: delay-message-single, when: "DELAY_MODEL == 'single'" }
+    - { role: delay-message-cluster, when: "DELAY_MODEL == 'cluster'" }
+  gather_facts: false
+  vars:
+    working_dir: "/data/delay"
+    rocketmq: "{{ groups.rocketmq[0] }}:9876"
+    # 单机配置
+    cluster_name: "cluster-a"
+    naming_port: 9999
+    naming_server_port: 9001
+    broker_port: 9991
+    broker_server_port: 19191
+    # pg 数据库信息
+    db_name: "delay_server"
+    pg_ip: "{{ groups.postgres[0] }}"
+    pg_port: 5432
+    pg_user: "postgres"
+    pg_pw: "Wshoto!@2024"
+
+    # 堆内存最大大小
+    jvm_mx: "4G"
+    # 堆内存初始大小
+    jvm_ms: "4G"
+    # 堆内存新生代
+    jvm_mn: "2G"

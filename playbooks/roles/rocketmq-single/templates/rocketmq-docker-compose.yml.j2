@@ -1,0 +1,48 @@
+version: '3.3'
+services:
+  namesrv:
+    image: apache/{{ rmqnamesrv_image }}
+    container_name: rmqnamesrv
+    ports:
+      - {{ rmqnamesrv_port }}:9876
+    environment:
+      JAVA_OPT_EXT: "-server -Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }}"
+    volumes:
+      - {{ working_dir }}/namesrv/logs:/home/rocketmq/logs
+      - /etc/localtime:/etc/localtime
+    command: sh mqnamesrv
+    restart: always
+  broker1:
+    image: apache/{{ broker_image }}
+    container_name: rmqbroker
+    links:
+      - namesrv
+    ports:
+      - {{ m_fastListenPort }}:10909
+      - {{ m_listenPort }}:10911
+      - {{ m_haListenPort }}:10912
+    environment:
+      NAMESRV_ADDR: namesrv:9876
+      JAVA_OPT_EXT: "-server -Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }}"
+    volumes:
+      - {{ working_dir }}/broker/logs:/home/rocketmq/logs
+      - {{ working_dir }}/broker/store:/home/rocketmq/store
+      - {{ working_dir }}/broker/conf/broker.conf:/opt/rocketmq-4.9.8/conf/broker.conf
+      - /etc/localtime:/etc/localtime
+    command: sh mqbroker -c /opt/rocketmq-4.9.8/conf/broker.conf
+    restart: always
+  dashbord:
+    image: apacherocketmq/{{ dashboard_image }}
+    container_name: rocketmq-dashboard
+    depends_on:
+      - namesrv
+    ports:
+      - {{ dashboard_port }}:8080
+    environment:
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=namesrv:9876 -Dlogging.level.root=off"
+      OPTS: "--rocketmq.config.namesrvAddrs=namesrv:9876"
+    volumes:
+      - /etc/localtime:/etc/localtime
+    restart: always
+
+

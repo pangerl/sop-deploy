@@ -1,0 +1,27 @@
+global
+    maxconn 2000
+
+defaults
+    log global
+    mode tcp
+    retries 2
+    timeout client 40m
+    timeout connect 4s
+    timeout server 40m
+    timeout check 5s
+
+listen stats
+    bind *:8089
+    mode http
+    stats enable
+    stats uri /stats
+    stats refresh 10s
+
+listen primary
+    bind *:{{ haproxy_port }}
+    option httpchk /primary 
+    http-check expect status 200
+    default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+    server node1 node1:5432 maxconn 2000 check port 8008
+    server node2 node2:5432 maxconn 2000 check port 8008
+    server node3 node3:5432 maxconn 2000 check port 8008

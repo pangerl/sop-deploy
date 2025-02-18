@@ -1,0 +1,111 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ image_dir }}"
+    - "{{ working_dir }}"
+
+- name: create conf directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ working_dir }}/broker-m/conf"
+    - "{{ working_dir }}/broker-s/conf"
+    - "{{ working_dir }}/broker-m/logs"
+    - "{{ working_dir }}/broker-s/logs"
+    - "{{ working_dir }}/broker-m/store"
+    - "{{ working_dir }}/broker-s/store"
+    - "{{ working_dir }}/namesrv/logs"
+    - "{{ working_dir }}/console/logs"
+
+- name: 下载 broker-m.conf 文件
+  template: src=broker-m.conf.j2 dest={{ working_dir }}/broker-m/conf/broker.conf mode=0644
+
+- name: 下载 broker-s.conf 文件
+  template: src=broker-s.conf.j2 dest={{ working_dir }}/broker-s/conf/broker.conf mode=0644
+
+- name: copy docker-compose-broker-m.yml file
+  template: src=docker-compose-broker-m.yml.j2 dest={{ working_dir }}/docker-compose-broker-m.yml mode=0755
+
+- name: copy docker-compose-broker-s.yml file
+  template: src=docker-compose-broker-s.yml.j2 dest={{ working_dir }}/docker-compose-broker-s.yml mode=0755
+
+- name: copy docker-compose-namesrv.yml file
+  template: src=docker-compose-namesrv.yml.j2 dest={{ working_dir }}/docker-compose-namesrv.yml mode=0755
+
+- name: owner working_dir directory
+  file:
+    path: "{{ working_dir }}"
+    state: directory
+    mode: 0755
+    owner: "3000"
+    group: "3000"
+    recurse: "yes"
+
+- name: remove container
+  shell: docker-compose -f {{ working_dir }}/{{ item }} down --remove-orphans
+  with_items:
+    - "docker-compose-broker-m.yml"
+    - "docker-compose-broker-s.yml"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+    with_items:
+    - "{{ load_namesrv_image }}"
+    - "{{ load_broker_image }}"
+    - "{{ load_dashboard_image }}"
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+    with_items:
+    - "{{ load_namesrv_image }}"
+    - "{{ load_broker_image }}"
+    - "{{ load_dashboard_image }}"
+    ignore_errors: true
+    
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- block:
+
+  - name: copy docker-compose-console.yml file
+    template: src=docker-compose-console.yml.j2 dest={{ working_dir }}/docker-compose-console.yml mode=0755
+
+  - name: remove dashboard container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-console.yml down --remove-orphans
+
+  - name: create dashboard container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-console.yml up -d
+    
+  when: "inventory_hostname == dashboard_ip"
+
+- block:
+
+  - name: copy docker-compose-namesrv.yml file
+    template: src=docker-compose-namesrv.yml.j2 dest={{ working_dir }}/docker-compose-namesrv.yml mode=0755
+
+  - name: remove namesrv container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-namesrv.yml down --remove-orphans
+
+  - name: create namesrv container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-namesrv.yml up -d
+    
+  when: "inventory_hostname != dashboard_ip"
+
+- name: create mqbroker master container
+  shell: docker-compose -f {{ working_dir }}/{{ item }} up -d
+  with_items:
+    - "docker-compose-broker-m.yml"
+
+- name: Wait for port 10911 to become open on the host, don't start checking for 20 seconds
+  wait_for:
+    port: 10911
+    delay: 20
+
+- name: create mqbroker slave container
+  shell: docker-compose -f {{ working_dir }}/{{ item }} up -d
+  with_items:
+    - "docker-compose-broker-s.yml"

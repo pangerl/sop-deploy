@@ -1,0 +1,32 @@
+- name: install gcc 
+  yum:
+    name: "{{ item  }}"
+    state: present
+  loop:
+    - "gcc"
+    - "gcc-c++"
+
+- name: download proxychains tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/proxychains-ng-4.16.tar.xz"
+    dest: /data
+    creates: /data/proxychains-ng-4.16
+
+- name: configure proxychains
+  shell: './configure --prefix=/usr --sysconfdir=/etc'
+  args:
+    chdir: /data/proxychains-ng-4.16
+
+- name: Build the default target
+  community.general.make:
+    chdir: /data/proxychains-ng-4.16
+
+- name: Run 'install' target as root
+  community.general.make:
+    chdir: /data/proxychains-ng-4.16
+    target: install
+
+- name: Template configuration file to wshoto.conf
+  template:
+    src: proxychains.conf.j2
+    dest: /etc/proxychains.conf

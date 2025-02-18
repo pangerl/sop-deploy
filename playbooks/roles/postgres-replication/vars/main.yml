@@ -1,0 +1,20 @@
+# 镜像名称
+container_name: "{%- if inventory_hostname == groups.postgres[0] -%} \
+                    postgres-master \
+                {%- else -%} \
+                    postgres-slave \
+                {%- endif -%}"
+                
+container_tag: "14.10.0"
+container_file: "postgresql_{{ container_tag }}"
+container_image: "postgresql:{{ container_tag }}"
+docker_network_name: "pg-tier"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"
+
+master_ip: "{{ groups.postgres[0] }}"
+slave_ip: "{{ groups.postgres[1] }}"

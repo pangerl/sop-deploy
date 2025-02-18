@@ -1,0 +1,12 @@
+- name: 部署 rocketmq
+  hosts:
+    - rocketmq
+  roles:
+  - { role: rocketmq5.3.0-single, when: "MQ_MODEL == 'single'" }
+  - { role: rocketmq5.3.0-cluster, when: "MQ_MODEL == 'cluster'" }
+  gather_facts: false
+  vars:
+    working_dir: "/data/rocketmq"
+    broker_jvm_mx: "2G"
+    broker_jvm_ms: "2G"
+    broker_jvm_mn: "1G"

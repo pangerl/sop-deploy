@@ -1,0 +1,9 @@
+---
+# vars file for hdp-ambari-server
+ambari_name: "ambari-2.7.5.0-centos7.tar.gz"
+HDP_name: "HDP-3.1.5.0-centos7-rpm.tar.gz"
+HDP_GPL_name: "HDP-GPL-3.1.5.0-centos7-gpl.tar.gz"
+HDP_UTILS_name: "HDP-UTILS-1.1.0.22-centos7.tar.gz"
+libtirpc_name: "libtirpc-0.2.4-0.16.el7.x86_64.rpm"
+libtirpc_devel_name: "libtirpc-devel-0.2.4-0.16.el7.x86_64.rpm"
+mysql_connector_java_name: "mysql-connector-java-5.1.49-bin.jar"

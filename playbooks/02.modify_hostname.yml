@@ -1,0 +1,7 @@
+- hosts: k8s
+  gather_facts: false
+  tasks:
+    - name: change name
+      raw: "echo {{ hostname|quote }} > /etc/hostname"
+    - name: hostname
+      shell: hostname {{ hostname|quote }}

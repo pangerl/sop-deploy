@@ -1,0 +1,11 @@
+# 镜像名称
+container_name: "postgresql"
+container_tag: "14.10.0"
+container_file: "postgresql_{{ container_tag }}"
+container_image: "postgresql:{{ container_tag }}"
+docker_network_name: "pg-tier"
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

@@ -1,0 +1,15 @@
+[Unit]
+Description=elasticsearch_exporter
+After=network.target
+
+[Service]
+Type=simple
+ExecStart={{ elasticsearch_dir }}/elasticsearch_exporter --es.all --es.indices --es.cluster_settings --es.indices_settings --es.shards --es.snapshots --es.timeout=10s --web.listen-address=:9114 --web.telemetry-path=/metrics --es.uri http://{{ es_user }}:{{ es_password }}@{{ es_url }}
+LimitNOFILE=65536
+PrivateTmp=true
+RestartSec=2
+StartLimitInterval=0
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

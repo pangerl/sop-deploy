@@ -1,0 +1,15 @@
+- name: 部署 minio
+  hosts:
+    - minio
+  roles:
+  - { role: minio-single, when: "MINIO_MODEL == 'single'" }
+  - { role: minio-cluster, when: "MINIO_MODEL == 'cluster'" }
+
+  gather_facts: false
+  vars:
+    working_dir: "/data/minio"
+    password: "Wshoto!@2024"
+#以下为minio集群配置，注意集群需要两块数据盘，并清空目录！
+    minio_user: "scrm"
+    minio_dir1: "/data"
+    minio_dir2: "/data2"

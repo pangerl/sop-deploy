@@ -1,0 +1,5 @@
+---
+# tasks file for ambari
+- include: httpd.yml
+- include: mysql-client.yml
+- include: ambari-server.yml

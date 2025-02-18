@@ -1,0 +1,32 @@
+brokerClusterName = DefaultCluster
+brokerName = broker-a
+# nameServer地址，分号分割
+# namesrvAddr = localhost:9876
+# 0 表示 Master，>0 表示 Slave
+brokerId = 0
+brokerIP1 = {{ brokerIP }}
+# 是否允许 Broker 自动创建Topic
+autoCreateTopicEnable = true
+# 是否允许 Broker 自动创建订阅组
+autoCreateSubscriptionGroup = true
+# Broker 对外服务的监听端口
+listenPort = 10911
+fastListenPort = 10909
+haListenPort = 10912
+# 删除文件时间点，默认凌晨 4点
+deleteWhen = 04
+# 文件保留时间，默认 48 小时
+fileReservedTime = 72
+mapedFileSizeCommitLog = 1073741824
+
+# Broker 的角色
+#- ASYNC_MASTER 异步复制Master
+#- SYNC_MASTER 同步双写Master
+#- SLAVE
+brokerRole = ASYNC_MASTER
+#刷盘方式
+#- ASYNC_FLUSH 异步刷盘
+#- SYNC_FLUSH 同步刷盘
+flushDiskType = ASYNC_FLUSH
+diskMaxUsedSpaceRatio = 88
+maxMessageSize = 65536

@@ -1,0 +1,50 @@
+## redis sentinel server pool define
+
+##SentinelServerPool {
+##    [Password xxx]                        #default no
+##    [Databases number]                    #default 1
+##    Hash atol|crc16
+##    [HashTag "xx"]                        #default no
+##    Distribution modula|random
+##    [MasterReadPriority [0-100]]          #default 50
+##    [StaticSlaveReadPriority [0-100]]     #default 0
+##    [DynamicSlaveReadPriority [0-100]]    #default 0
+##    [RefreshInterval number[s|ms|us]]     #default 1, means 1 second
+##    [ServerTimeout number[s|ms|us]]       #default 0, server connection socket read/write timeout
+##    [ServerFailureLimit number]           #default 10
+##    [ServerRetryTimeout number[s|ms|us]]  #default 1
+##    [KeepAlive seconds]                   #default 0, server connection tcp keepalive
+##    Sentinels {
+##        + addr
+##        ...
+##    }
+##    Group xxx {
+##        [+ addr]
+##        ...
+##    }
+##}
+
+
+# Examples:
+SentinelServerPool {
+    Password {{ password }}
+    Databases 16
+    Hash crc16
+    HashTag "{}"
+    Distribution modula
+    MasterReadPriority 60
+    StaticSlaveReadPriority 50
+    DynamicSlaveReadPriority 50
+    RefreshInterval 1
+    ServerTimeout 1
+    ServerFailureLimit 10
+    ServerRetryTimeout 1
+    KeepAlive 120
+    Sentinels {
+        + {{ prefixy_redis_master }}:{{ redis_sentinel_port }}
+        + {{ prefixy_redis_slave }}:{{ redis_sentinel_port }}
+        + {{ prefixy_redis_slave2 }}:{{ redis_sentinel_port }}
+    }
+    Group mymaster {
+    }
+}

@@ -1,0 +1,32 @@
+- name: 部署 elasticsearch
+  hosts:
+    - "{{ groups.es[0] }}"
+  roles:
+    - elasticsearch-single
+  gather_facts: false
+  vars:
+    working_dir: "/data/elastic"
+    kibana_port: 5601
+    es_http_port: 9200
+    es_tcp_port: 9300
+    es_user: "elastic"
+    es_password: "Wshoto!@2024"
+    # 不能超过物理内存的一半
+    jvm_mem: "3g"
+
+
+- name: 部署 kibana
+  hosts:
+    - kibana
+  roles:
+    - docker
+    - kibana
+  gather_facts: false
+  vars:
+    # ansible_python_interpreter: /usr/bin/python2
+    working_dir: "/data/elastic"
+    kibana_port: 5601
+    es_http_port: 9200
+    es_user: "elastic"
+    es_password: "Wshoto!@2024"
+    es_ip: "{{ groups.es[0] }}"

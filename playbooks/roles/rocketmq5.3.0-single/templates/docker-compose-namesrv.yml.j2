@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  rmqnamesrv:
+    image: {{ mq_image }}
+    container_name: rmqnamesrv
+    ports:
+      - "9876:9876"
+    network_mode: bridge
+    volumes:
+      - {{ working_dir }}/namesrv/logs:/home/rocketmq/logs
+      - {{ working_dir }}/namesrv.conf:/home/rocketmq/rocketmq-5.3.0/conf/namesrv.conf
+      - /etc/localtime:/etc/localtime
+    command: sh mqnamesrv -c /home/rocketmq/rocketmq-5.3.0/conf/namesrv.conf
+    restart: always

@@ -1,0 +1,29 @@
+
+- name: 获取是否已经安装 pip2
+  shell: 'which pip2 || echo "NoFound"'
+  register: is_pip2
+
+- block:
+
+  # yum install -y python-pip
+  - name: 下载 get-pip.py
+    unarchive:
+      src: "{{ project_dir }}/ansible/packages/get_pip2.tgz"
+      dest: /tmp
+      creates: /tmp/get_pip2
+
+  - name: 安装 pip2
+    shell: /usr/bin/python2 get-pip.py --no-index --find-links=.
+    args:
+      chdir: /tmp/get_pip2
+  when: "'NoFound' in is_pip2.stdout"
+
+- name: 下载 pip2_docker.tgz 数据包
+  unarchive:
+    src: "{{ project_dir }}/ansible/packages/pip2_docker.tgz"
+    dest: /tmp
+    creates: /tmp/pip2_docker
+
+# pip install docker --ignore-installed requests
+- name: 安装 docker 模块
+  shell: pip2 install --no-index -f /tmp/pip2_docker docker --ignore-installed requests

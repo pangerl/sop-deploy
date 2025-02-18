@@ -1,0 +1,17 @@
+- name: 部署 skywalking
+  hosts:
+    - harbor
+  gather_facts: false
+  roles:
+    - harbor
+  vars:
+    data_dir: "/data/harbor"
+    # 不能超过物理内存的一半
+    HARBOR_PORT: 80
+    # 默认用户 admin
+    HARBOR_PW: "xxxxxx2"
+    # install extra component
+    HARBOR_WITH_NOTARY: false
+    HARBOR_WITH_TRIVY: false
+    HARBOR_WITH_CLAIR: false
+    HARBOR_WITH_CHARTMUSEUM: true

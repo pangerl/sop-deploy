@@ -1,0 +1,31 @@
+- name: 部署 kafka
+  hosts:
+    - kafka
+  roles:
+  - java
+  - zookeeper
+  - kafka-cluster
+  vars:
+    working_dir: "/data/kafka"
+    JAVA_HOME: "/opt/java"
+    # zookeeper
+    zookeeper_data_dir: "/data/zookeeper"
+    zookeeper_data_log_dir: "/data/zookeeper"
+    zookeeper_client_port: 2181
+    # zookeeper_user: "root"
+    # zookeeper_group: "root"
+    # kafka
+    kafka_port: 9092
+    kafka_log_retention_hours: 120
+    kafka_data_log_dirs: "/data/kafka/logs"
+    kafka_java_heap: "-Xms4G -Xmx4G"
+
+- name: 部署 kafdrop
+  hosts:
+    - kafdrop
+  roles:
+  - kafdrop
+  vars:
+    kafka_port: 9092
+    kafdrop_port: 9000
+    kafka_ip: "{{ inventory_hostname }}"

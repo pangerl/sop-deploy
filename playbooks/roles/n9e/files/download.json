@@ -1,0 +1,3281 @@
+[
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "5分钟平均 cpu load 大于cpu核心数",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 300,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "system_load5 > system_n_cpus",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "azkaban 进程数少于2个",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "procstat_lookup_count{search_string=\"azkaban\"} < 2",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "CPU使用率超过98%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 300,
+    "prom_ql": "",
+    "rule_config": {
+      "inhibit": false,
+      "queries": [
+        {
+          "prom_ql": "cpu_usage_active > 98",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "0"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "0"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "delay端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"delay\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "elasticsearch集群当前数据节点存活数小于数据节点",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "min(elasticsearch_cluster_health_number_of_nodes) < min(elasticsearch_cluster_health_number_of_data_nodes)",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "fastdfs接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"fastdfs\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "fastdfs端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"fastdfs\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "flume 进程数少于3个",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "procstat_lookup_count{search_string=\"flume\"} < 3",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "kafka端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"kafka\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "mysql 最近一分钟出现了慢查询",
+    "note": "MySQL server mysql has some new slow query",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 120,
+    "prom_ql": "",
+    "rule_config": {
+      "inhibit": false,
+      "queries": [
+        {
+          "prom_ql": "increase(mysql_global_status_slow_queries[1m]) > 0",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "0"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "0"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [
+      "alertname=MysqlSlowQueries"
+    ],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "mysql最大连接数超过80%",
+    "note": "More than 80% of MySQL connections are in use",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 120,
+    "prom_ql": "",
+    "rule_config": {
+      "inhibit": false,
+      "queries": [
+        {
+          "prom_ql": "avg by (instance) (mysql_global_status_threads_connected) / avg by (instance) (mysql_global_variables_max_connections) * 100 > 80",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "0"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "0"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [
+      "alertname=MysqlTooManyConnections"
+    ],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "mysql服务down",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "mysql_up == 0",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "nacos 健康服务数少于7",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "nacos_service_num < 7",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "nacos端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"nacos\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "postgresql 连接数超过2500",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "sum(postgresql_numbackends) > 2500",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "postgresql端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"postgresql\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "redis分配内存使用率超过85%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "inhibit": false,
+      "queries": [
+        {
+          "prom_ql": "redis_maxmemory > 0 and (redis_used_memory / redis_maxmemory) > 0.85",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "0"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "0"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "redis端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"redis\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "rocketmq 队列堆积超过100",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 300,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "rocketmq_offset_diffTopic > 100",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "rocketmq端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"rocketmq\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "SparkSubmit  job数少于3个",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "procstat_lookup_count{search_string=\"SparkSubmit\"} < 3",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "xxl-job端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"xxl-job\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "内存使用率超过80%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "inhibit": false,
+      "queries": [
+        {
+          "prom_ql": "mem_used_percent > 80",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "0"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "0"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务apps  nacos健康实列数低于50%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "nacos_service_apps_num / nacos_service_apps_pre_num < 0.5",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务base  nacos健康实列数低于50%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "nacos_service_base_num / nacos_service_base_pre_num < 0.5",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务base接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"base\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务base端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"base\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务bigdata-apps接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"bigdata-apps\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务bigdata-apps端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"bigdata-apps\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务conversation  nacos健康实列数低于50%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "nacos_service_conversation_num / nacos_service_conversation_pre_num < 0.5",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务conversation接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"conversation\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务conversation端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"conversation\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务gateway nacos健康实列数低于50%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "nacos_service_gateway_num / nacos_service_gateway_pre_num < 0.5",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务gateway接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"gateway\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务gateway端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"gateway\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务getway接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"gateway\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务mall  nacos健康实列数低于50%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "nacos_service_mall_num / nacos_service_mall_pre_num < 0.5",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务mall接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"mall\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务mall端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"mall\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务marketing nacos健康实列数低于50%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "nacos_service_marketing_num / nacos_service_marketing_pre_num < 0.5",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务marketing接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"marketing\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务marketing端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"marketing\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务uaa  nacos健康实列数低于50%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "nacos_service_uaa_num / nacos_service_uaa_pre_num < 0.5",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务uaa接口健康检查失败",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "http_response_response_code{product=\"uaa\"} != 200",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "应用服务uaa端口不通",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "net_response_result_code{product=\"uaa\"} != 0",
+          "severity": 1
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "host",
+    "datasource_ids": null,
+    "name": "服务器不在线",
+    "note": "",
+    "prod": "host",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      1
+    ],
+    "disabled": 0,
+    "prom_for_duration": 30,
+    "prom_ql": "",
+    "rule_config": {
+      "inhibit": false,
+      "queries": [
+        {
+          "key": "all_hosts",
+          "op": "==",
+          "values": []
+        }
+      ],
+      "triggers": [
+        {
+          "duration": 60,
+          "severity": 1,
+          "type": "target_miss"
+        }
+      ]
+    },
+    "prom_eval_interval": 150,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "0"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "0"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "磁盘使用率超过80%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "inhibit": false,
+      "queries": [
+        {
+          "prom_ql": "disk_used_percent > 80",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 15,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "0"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "0"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  },
+  {
+    "cate": "prometheus",
+    "datasource_ids": [
+      0
+    ],
+    "name": "系统文件打开数超过80%",
+    "note": "",
+    "prod": "metric",
+    "algorithm": "",
+    "algo_params": null,
+    "delay": 0,
+    "severity": 0,
+    "severities": [
+      2
+    ],
+    "disabled": 0,
+    "prom_for_duration": 60,
+    "prom_ql": "",
+    "rule_config": {
+      "queries": [
+        {
+          "prom_ql": "linux_sysctl_fs_file_nr / linux_sysctl_fs_file_max * 100 > 80",
+          "severity": 2
+        }
+      ]
+    },
+    "prom_eval_interval": 30,
+    "enable_stime": "00:00",
+    "enable_stimes": [
+      "00:00"
+    ],
+    "enable_etime": "23:59",
+    "enable_etimes": [
+      "23:59"
+    ],
+    "enable_days_of_week": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "enable_days_of_weeks": [
+      [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ]
+    ],
+    "enable_in_bg": 0,
+    "notify_recovered": 1,
+    "notify_channels": [
+      "wecom_proxy"
+    ],
+    "notify_repeat_step": 60,
+    "notify_max_number": 0,
+    "recover_duration": 0,
+    "callbacks": [],
+    "runbook_url": "",
+    "append_tags": [],
+    "annotations": {}
+  }
+]

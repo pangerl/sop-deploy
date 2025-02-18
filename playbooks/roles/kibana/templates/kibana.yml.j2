@@ -1,0 +1,7 @@
+server.name: kibana
+server.host: "0.0.0.0"
+elasticsearch.hosts: [ "http://{{ es_ip }}:{{ es_http_port }}" ]
+xpack.monitoring.ui.container.elasticsearch.enabled: true
+i18n.locale: "zh-CN"
+elasticsearch.username: "{{ es_user }}"
+elasticsearch.password: "{{ es_password }}"

@@ -1,0 +1,91 @@
+scope: "pg_patroni"
+namespace: /db/
+name: "{{ hostvars[inventory_hostname].hostname }}"
+
+log:
+  format: "%(asctime)s %(levelname)s: %(message)s"
+  level: INFO
+  max_queue_size: 1000
+  traceback_level: ERROR
+  type: plain
+
+restapi:
+  connect_address: "{{ inventory_hostname }}:8008"
+  listen: "0.0.0.0:8008"
+
+etcd3:
+  hosts:
+{% for etcd_ip in groups.patroni %}
+  - {{ etcd_ip }}:2379
+{% endfor %}
+  retry_timeout: 30
+  ttl: 60
+
+bootstrap:
+  dcs:
+    loop_wait: 10
+    retry_timeout: 10
+    ttl: 30
+    maximum_lag_on_failover: 1048576
+
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+      parameters:
+        hot_standby: "on"
+        max_connections: 2000
+        shared_buffers: 4GB
+        max_locks_per_transaction: 64
+        max_prepared_transactions: 0
+        max_replication_slots: 10
+        max_wal_senders: 10
+        max_worker_processes: 8
+        track_commit_timestamp: "off"
+        wal_keep_size: 5GB
+        wal_level: replica
+        wal_log_hints: "on"
+        max_wal_size: "10GB"
+        archive_mode: "on"
+        archive_timeout: 600s
+        archive_command: "cp -f %p {{ data_dir }}/data/archived/%f"
+
+  initdb:
+    - encoding: UTF8
+    - locale: C
+    - data-checksums
+
+  pg_hba:
+    - host all all 0.0.0.0/0 md5
+    - host replication replicator 0.0.0.0/0 md5
+    - host replication replicator 127.0.0.1/32 trust
+
+postgresql:
+  listen: "0.0.0.0:5432"
+  connect_address: "{{ inventory_hostname }}:5432"
+  bin_dir: "/usr/pgsql-14/bin/"
+  data_dir: "{{ data_dir }}/data/"
+  parameters:
+    password_encryption: scram-sha-256
+    unix_socket_directories: "/var/run/postgresql/"
+  authentication:
+    replication:
+      password: "replicator"
+      username: "replicator"
+    superuser:
+      password: "{{ pg_password }}"
+      username: postgres
+  create_replica_methods:
+      - basebackup
+  basebackup:
+      checkpoint: "fast"
+
+watchdog:
+  mode: automatic
+  device: /dev/watchdog
+
+tags:
+  clonefrom: false
+  failover_priority: 1
+  noloadbalance: false
+  nostream: false
+  nosync: false

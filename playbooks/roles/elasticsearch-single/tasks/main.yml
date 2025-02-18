@@ -1,0 +1,90 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+    with_items:
+    - "{{ es_image }}"
+    # - "{{ kibana_image }}"
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+    with_items:
+    - "{{ es_image }}"
+    # - "{{ kibana_image }}"
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+# - name: 下载 kibana.yml 文件
+#   template: src=kibana.yml.j2 dest={{ working_dir }}/kibana.yml mode=0644
+
+- name: copy es-docker-compose.yml 文件
+  template: src=es-docker-compose.yml.j2 dest={{ working_dir }}/es-docker-compose.yml mode=0644
+
+- name: create data directory
+  file:
+    path: "{{ working_dir }}/elasticsearch-plugins"
+    state: directory
+    owner: 1000
+    group: 1000
+
+- name: remove container  es
+  shell: docker-compose -f es-docker-compose.yml down
+  args:
+    chdir: "{{ working_dir }}"
+
+- name: install analysis-ik
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/analysis-ik.tgz"
+    dest: "{{ working_dir }}/elasticsearch-plugins"
+    creates: "{{ working_dir }}/elasticsearch-plugins/analysis-ik"
+    owner: 1000
+    group: 1000
+
+- name: create container  es
+  shell: docker-compose -f es-docker-compose.yml up -d
+  args:
+    chdir: "{{ working_dir }}"
+  
+
+- name: create user
+  shell: docker exec elasticsearch-single /bin/bash -c 'bin/elasticsearch-users useradd admin -p admin123 -r superuser'
+  
+- name: wait for es_http_port to be running
+  wait_for: 
+    port: "{{ es_http_port | int }}"  
+    host: "{{ es_ip }}"
+    delay: 10 
+    timeout: 300
+  tags: add_user
+  run_once: true
+  connection: local
+
+#- name: Change elastic password
+#  shell: |
+#    curl -u admin:admin123 -XPUT "http://{{ es_ip }}:{{ es_http_port }}/_xpack/security/user/elastic/_password?pretty" -H 'Content-Type: application/json' -d  '{"password":"{{ es_password }}"}'
+
+- name: Change elastic password
+  uri:
+    url: "http://{{ es_ip }}:{{ es_http_port }}/_xpack/security/user/{{ es_user }}/_password?pretty"
+    method: PUT
+    headers:
+      Content-Type: "application/json"
+    user: "admin"
+    password: "admin123"
+    body_format: json
+    body: '{"password":"{{ es_password }}"}'
+    force_basic_auth: yes
+  tags: add_user
+  run_once: true
+  connection: local
+
+- name: Delete the Superuser
+  shell: docker exec {{ es_name }} /bin/bash -c 'bin/elasticsearch-users userdel admin'

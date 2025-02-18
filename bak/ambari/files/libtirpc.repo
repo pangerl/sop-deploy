@@ -1,0 +1,6 @@
+[libtirpc_repo]
+name=libtirpc-0.2.4-0.16
+baseurl=http://hdp101/libtirpc/
+gpgcheck=0
+enabled=1
+priority=1

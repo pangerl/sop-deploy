@@ -1,0 +1,47 @@
+- name: prepare some dirs
+  file: name={{ item }} state=directory mode=0700
+  with_items:
+  - "{{ ETCD_DATA_DIR }}"
+  - "{{ bin_dir }}"
+
+- name: 下载etcd二进制文件
+  copy: src={{ project_dir }}/packages/binary_tag/bin/{{ item }} dest={{ bin_dir }}/{{ item }} mode=0755
+  with_items:
+  - etcd
+  - etcdctl
+  tags: upgrade_etcd
+
+- name: 创建etcd的systemd unit文件
+  template: src=etcd.service.j2 dest=/etc/systemd/system/etcd.service
+  tags: upgrade_etcd, restart_etcd
+
+- name: 设置环境变量
+  lineinfile:
+    path: /etc/profile
+    line: |
+      export ETCDCTL_API=3
+      export ENDPOINTS={{ ENDPOINTS }}
+      export PATH={{ bin_dir }}:$PATH
+    create: yes
+
+- name: 使环境变量生效
+  shell: source /etc/profile
+  args:
+    executable: /bin/bash
+
+- name: 开机启用etcd服务
+  shell: systemctl enable etcd
+  ignore_errors: true
+
+- name: 开启etcd服务
+  shell: systemctl daemon-reload && systemctl restart etcd
+  ignore_errors: true
+  tags: upgrade_etcd, restart_etcd, force_change_certs
+
+- name: 以轮询的方式等待服务同步完成
+  shell: "systemctl is-active etcd.service"
+  register: etcd_status
+  until: '"active" in etcd_status.stdout'
+  retries: 8
+  delay: 8
+  tags: upgrade_etcd, restart_etcd, force_change_certs

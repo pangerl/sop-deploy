@@ -1,0 +1,49 @@
+- name: Create minio group
+  group:
+    name: "{{ minio_user }}"
+    state: present
+    system: yes
+
+- name: Create minio user
+  user:
+    name: "{{ minio_user }}"
+    group: "{{ minio_user }}"
+    state: present
+    createhome: no
+    system: yes
+
+- name: Check if minio has already been downloaded and unpacked
+  stat:
+    path: "{{ minio_dir1 }}"
+  register: dir
+
+- name: Check if minio2 has already been downloaded and unpacked
+  stat:
+    path: "{{ minio_dir2 }}"
+  register: dir
+
+- name: download minio
+  copy: src={{ project_dir }}/packages/binary_tag/minio dest=/usr/local/bin/minio mode=0777
+
+- name: 添加minio配置文件
+  template:
+    src: minio.conf.j2
+    dest: "/etc/minio.conf"
+    owner: "{{ minio_user }}"
+    group: "{{ minio_group }}"
+    mode: 0644
+
+- name: Template minio.service system file
+  template:
+    src: minio.service.j2
+    dest: "/usr/lib/systemd/system/minio.service"
+    group: "{{ minio_user }}"
+    owner: "{{ minio_user }}"
+    mode: '0644'
+
+- name: Start the minio service
+  systemd:
+    name: minio.service
+    state: started
+    enabled: yes
+

@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  {{ container_name }}:
+    image: bitnami/{{ container_image }}
+    network_mode: "host"
+    container_name: {{ container_name }}
+    ports:
+      - {{ redis_port }}
+    volumes:
+      - {{ working_dir }}/data:/bitnami/redis/data
+      - /etc/localtime:/etc/localtim
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD="{{ password }}"    
+    restart: always
+  {{ container_sentinel_name }}:
+    image: bitnami/{{ container_sentinel_image }}
+    network_mode: "host"
+    container_name: {{ container_sentinel_name }}
+    environment:
+      - REDIS_MASTER_HOST="{{ master_ip }}"
+      - REDIS_MASTER_PASSWORD="{{ password }}" 
+    ports:
+      - {{ redis_sentinel_port }}
+    restart: always

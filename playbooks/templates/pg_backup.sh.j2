@@ -1,0 +1,54 @@
+#!/bin/bash
+set -o nounset
+set -o errexit
+
+# 登陆信息
+bin_dir=/usr/bin
+pg_ip={{ pg_ip }}
+pg_port={{ pg_port }}
+pg_user=postgres
+pg_pw={{ pg_password }}
+base_dir={{ base_dir }}
+export PGPASSWORD=$pg_pw
+
+# 备份目录
+cur_time=$(date '+%Y-%m-%d')
+tendays_time=$(date -d -10days '+%Y-%m-%d')
+back_dir=$base_dir/$cur_time
+del_dir=$base_dir/$tendays_time
+
+# 创建备份文件夹
+function check_create_directory() {
+    if [ ! -d $back_dir ]; then
+      mkdir -p $back_dir
+    fi
+}
+
+# 获取数据库列表
+# db_list=$($bin_dir/psql -d postgres -U $pg_user -h $pg_ip -p $pg_port -w -c "SELECT datname FROM pg_database;")
+# db_list=${db_list%(*} && db_list=${db_list##*---} && db_list=${db_list//postgres/}
+# db_list=${db_list//template0/} && db_list=${db_list//template1/}
+
+db_list=$($bin_dir/psql -U "$pg_user" -h "$pg_ip" -p "$pg_port" -d postgres -t -c "\l" | awk '{print $1}' | grep -vE '^-|^List|^Name|template[01]|\||^$')
+
+# 备份数据库
+function backup_database() {
+	for item in ${db_list};do
+		echo "--------$item--------"
+		$bin_dir/pg_dump -U $pg_user -h $pg_ip -p $pg_port $item | xz > $back_dir/${item}.xz $item
+		echo "---------------------"
+	done
+}
+
+echo "Starting Backup PostgreSQL ..."
+check_create_directory
+backup_database
+# 删除过期备份
+rm -rf $del_dir
+echo "Finish Backup ..."
+
+# 解压 dump 文件
+# xz -d base.xz
+
+# 数据恢复
+# $bin_dir/psql -U $pg_user -h $pg_ip -p $pg_port -f $back_dir/${item}.dump -d $item

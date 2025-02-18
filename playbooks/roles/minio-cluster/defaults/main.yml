@@ -1,0 +1,5 @@
+# 镜像名称
+container_name: "minio"
+container_tag: "2024"
+container_file: "minio_{{ container_tag }}"
+container_image: "minio:{{ container_tag }}"

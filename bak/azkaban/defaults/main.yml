@@ -1,0 +1,12 @@
+---
+# vars file for azkaban
+azkaban_db_sql: "create-all-sql-3.90.sql"
+azkaban_exec_name: "azkaban-exec-3.90.tar.gz"
+azkaban_web_name: "azkaban-web-3.90.tar.gz"
+
+azkaban_ip: "{{ inventory_hostname }}"
+
+
+azkaban_create_user_group: true
+azkaban_group: azkaban
+azkaban_user: azkaban

@@ -1,0 +1,51 @@
+# my global config
+global:
+  scrape_interval:     30s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+  external_labels:
+    project: "{{project}}"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'app_tcp_probe'
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+    - targets: ['{{ alarm_go_metric_url }}']
+
+#  - job_name: 'app_tcp_probe'
+#    metrics_path: /probe
+#    params:
+#      module: [tcp_connect]
+#    http_sd_configs:
+#    - url: http://127.0.0.1:8099
+#      refresh_interval: 500s
+#    relabel_configs:
+#      - source_labels: [__address__]
+#        target_label: __param_target
+#      - source_labels: [__param_target]
+#        target_label: instance
+#      - target_label: __address__
+#        replacement: 127.0.0.1:9115
+
+#  - job_name: 'app_http_probe'
+#    metrics_path: /probe
+#    params:
+#      module: [http_2xx_wshoto]
+#    http_sd_configs:
+#    - url: http://127.0.0.1:8099
+#      refresh_interval: 500s
+#    relabel_configs:
+#      - source_labels: [__address__]
+#        target_label: __param_target
+#        replacement: http://$1/actuator/test
+#      - source_labels: [__param_target]
+#        target_label: instance
+#      - target_label: __address__
+#        replacement: 127.0.0.1:9115
+
+remote_write:
+  - url: 'http://127.0.0.1:17000/prometheus/v1/write'

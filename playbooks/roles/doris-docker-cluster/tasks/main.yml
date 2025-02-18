@@ -1,0 +1,127 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ doris_home }}"
+    - "{{ image_dir }}"
+
+- name: Setting present kernel params
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    ignoreerrors: yes
+    state: present
+  with_items:
+    - { name: 'vm.swappiness', value: 0  }
+    - { name: 'vm.max_map_count', value: 2000000 }
+  become: yes
+
+- name: add sysctl
+  shell: "sysctl -w vm.max_map_count=2000000 &&  swapoff -a"
+
+- name: 关闭透明大页
+  shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled && echo never > /sys/kernel/mm/transparent_hugepage/defrag"
+
+
+- name: Template fe.conf.template file to conf
+  template:
+    src: fe.conf.j2
+    dest: "{{ doris_home }}/fe.conf"
+    mode: '0644'
+
+- name: Template be.conf.template file to conf
+  template:
+    src: be.conf.j2
+    dest: "{{ doris_home }}/be.conf"
+    mode: '0644'
+
+
+- block:
+  - name: download image fe
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_file_fe }} dest={{ image_dir }}/{{ container_file_fe }} mode=0644
+
+  - name: load image fe
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file_fe }}
+    ignore_errors: true
+
+  - name: download image be
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_file_be }} dest={{ image_dir }}/{{ container_file_be }} mode=0644
+
+  - name: load image be
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file_be }}
+    ignore_errors: true
+
+  - name: copy docker-compose-doris-fe.yml file
+    template: src=docker-compose-doris-fe.yaml.j2 dest={{ doris_home }}/docker-compose-doris-fe.yaml mode=0755
+
+  - name: remove container  doris-fe
+    shell: docker-compose -f docker-compose-doris-fe.yaml down
+    args:
+      chdir: "{{ doris_home }}"
+
+  - name: create container  doris-fe
+    shell: docker-compose -f docker-compose-doris-fe.yaml up -d
+    args:
+      chdir: "{{ doris_home }}"
+
+  when: "doris_role == 'master'"
+
+
+- block:
+  - name: download image be
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_file_be }} dest={{ image_dir }}/{{ container_file_be }} mode=0644
+
+  - name: load image be
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file_be }}
+    ignore_errors: true
+
+  - name: copy docker-compose-doris-be.yml file
+    template: src=docker-compose-doris-be.yaml.j2 dest={{ doris_home }}/docker-compose-doris-be.yaml mode=0755
+
+  - name: remove container  doris-be
+    shell: docker-compose -f docker-compose-doris-be.yaml down
+    args:
+      chdir: "{{ doris_home }}"
+
+  - name: create container  doris-be
+    shell: docker-compose -f docker-compose-doris-be.yaml up -d
+    args:
+      chdir: "{{ doris_home }}"
+
+  when: "doris_role == 'follower'"
+
+
+  
+- name: Template fe.conf.template file to conf
+  template:
+    src: fe.conf.j2
+    dest: "{{ doris_home }}/fe.conf"
+    mode: '0644'
+
+- name: Template be.conf.template file to conf
+  template:
+    src: be.conf.j2
+    dest: "{{ doris_home }}/be.conf"
+    mode: '0644'
+
+- name: wait for 9030 to be running
+  wait_for:
+    port: "9030"
+    host: "{{ groups.doris[0] }}"
+    delay: 10
+    timeout: 500
+
+- block:
+  - name: set databases paasword
+    shell: mysql -h{{ groups.doris[0] }} -P9030 -uroot -e 'set PASSWORD FOR "root"=PASSWORD("Wshoto!@2024");'
+  run_once: true
+  connection: local
+
+
+
+- name: 内置的 Web UI
+  debug:
+    msg:
+    - "访问地址： http://{{ groups.doris[0] }}:18030 ,账号密码： root/Wshoto!@2024"
+  run_once: true

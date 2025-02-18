@@ -1,0 +1,4 @@
+container_name: xxl-job
+container_tag: "2.4.1-20250103"
+container_file: "xxljob_2.4.1-pg-2025"
+container_image: "ka-tcr.tencentcloudcr.com/middleware/xxljob:{{ container_tag }}"

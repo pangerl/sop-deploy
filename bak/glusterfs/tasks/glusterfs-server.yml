@@ -1,0 +1,28 @@
+- name: 安装glusterfs
+  yum:
+    name: glusterfs-server
+    state: present
+
+- name: 启动glusterfs
+  systemd:
+    name: glusterd
+    state: started
+    enabled: yes
+
+- name: create working_dir directory
+  file:
+    path: "{{ working_dir }}"
+    state: directory
+
+- block:
+
+  - name: 初始化节点
+    shell: gluster peer probe glusternode01 && gluster peer probe glusternode02 && gluster peer probe glusternode03
+
+  - name: 初始化卷
+    shell: "gluster volume create brick-data replica 3 glusternode01:{{ working_dir }} glusternode02:{{ working_dir }} glusternode03:{{ working_dir }} force"
+
+  - name: 启动卷
+    shell: gluster volume start brick-data
+
+  when: "inventory_hostname == groups.glusterserver[0]"

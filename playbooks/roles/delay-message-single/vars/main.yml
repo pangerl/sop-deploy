@@ -1,0 +1,9 @@
+
+
+
+naming_image: "wshoto-delay-message-naming:V3PRODHA.3"
+broker_image: "wshoto-delay-message-broker:V3PRODHA.PGSQL.3"
+
+delay_ip: "{{ inventory_hostname }}"
+
+delay_list: "{{ delay_ip }}:{{ timer_server_port_1 }},{{ delay_ip }}:{{ timer_server_port_2 }},{{ delay_ip }}:{{ timer_server_port_3 }}"

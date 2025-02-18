@@ -1,0 +1,18 @@
+
+prometheus_data_dir: "{%- if server_enabled | bool -%} \
+                        '{{ prometheus_dir }}/data' \
+                      {%- else -%} \
+                        '{{ prometheus_dir }}/data-agent' \
+                      {%- endif -%}"
+
+# prometheus_service: "{%- if server_enabled | bool -%} \
+#                         prometheus.service.j2 \
+#                       {%- else -%} \
+#                         prometheus_agent.service.j2 \
+#                       {%- endif -%}"
+
+# prometheus_conf: "{%- if server_enabled | bool -%} \
+#                         prometheus.yml.j2 \
+#                       {%- else -%} \
+#                         prometheus_agent.yml.j2 \
+#                       {%- endif -%}"

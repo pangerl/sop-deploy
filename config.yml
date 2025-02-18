@@ -1,0 +1,71 @@
+# 下面是 playbook 需要用到的参数
+
+# Binaries Directory
+bin_dir: "/opt/kube/bin"
+
+# project Directory
+project_dir: "/data/sop-deploy"
+
+# 使用python2
+# ansible_python_interpreter: /usr/bin/python2
+
+# 离线镜像保存目录
+image_dir: "/opt/images"
+
+# 部署版本 24.1
+scrm_version: "24.1"
+
+# 标准版/金融版 
+# standard|finance
+# scrm_function: "standard"
+
+# 服务模式
+# single|replication|sentinel
+REDIS_MODEL: "single"
+# single|replication|ha
+PG_MODEL: "single"
+MySQL_MODEL: "single"
+# single|cluster
+MQ_MODEL: "single"
+DELAY_MODEL: "single"
+FAST_MODEL: "single"
+NACOS_MODEL: "single"
+XXL_JOB_MODEL: "single"
+ES_MODEL: "single"
+MINIO_MODEL: "single"
+# 重要，单机集群的sql不一样
+DORIS_MODEL: "single"
+
+# 可选中间件离线安装系统软件包 (offline|online)
+MID_INSTALL_SOURCE: "offline"
+
+# 本地yum源，需提前部署yum源服务器，可使用脚本：install_repo_local.sh 
+LOCAL_YUM: false
+yum_ip: 1.1.1.1
+
+# docker 相关
+
+# 容器存储目录
+# DOCKER_STORAGE_DIR: "/var/lib/docker"
+DOCKER_STORAGE_DIR: "/data/docker"
+
+# 国内镜像加速
+ENABLE_MIRROR_REGISTRY: true
+
+# [docker]开启Restful API
+ENABLE_REMOTE_API: false
+
+# [docker]信任的HTTP仓库
+INSECURE_REG: '["172.18.1.0/24"]'
+
+# 设置时间源服务器【重要：集群内机器时间必须同步】
+ntp_servers:
+  - "ntp1.aliyun.com"
+  - "ntpupdate.tencentyun.com"
+  - "0.cn.pool.ntp.org"
+
+# 设置允许内部时间同步的网络段，比如"10.0.0.0/8"，默认全部允许
+local_network: "0.0.0.0/0"
+
+# 可选离线安装系统软件包 (offline|online)
+INSTALL_SOURCE: "offline"

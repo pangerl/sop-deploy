@@ -1,0 +1,108 @@
+- hosts:
+  - localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: 查看 master 组件状态
+      shell: kubectl get cs
+      register: cs_result
+
+    - debug:
+        var: cs_result.stdout_lines
+
+    - name: 查看 node 组件状态
+      shell: kubectl get node -o wide
+      register: node_result
+      
+    - debug:
+        var: node_result.stdout_lines
+
+    - name: redis - check if redis:6379 is accessible
+      wait_for:
+        host: "{{ item }}"
+        port: 6379
+        state: started
+        delay: 1
+        timeout: 2
+        sleep: 1
+      with_items: 
+        - "{{ groups.redis }}"
+      ignore_errors: true
+
+    - name: postgres - check if postgres:5432 is accessible
+      wait_for:
+        host: "{{ item }}"
+        port: 5432
+        state: started
+        delay: 1
+        timeout: 2
+        sleep: 1
+      with_items: 
+        - "{{ groups.postgres }}"
+      ignore_errors: true
+
+    - name: kafka - check if kafka:9092 is accessible
+      wait_for:
+        host: "{{ item }}"
+        port: 9092
+        state: started
+        delay: 1
+        timeout: 2
+        sleep: 1
+      with_items: 
+        - "{{ groups.kafka }}"
+      ignore_errors: true
+
+    - name: delay-message - check if delay-message:8801 is accessible
+      wait_for:
+        host: "{{ item }}"
+        port: 8801
+        state: started
+        delay: 1
+        timeout: 2
+        sleep: 1
+      with_items: 
+        - "{{ groups.delay }}"
+      ignore_errors: true
+
+    - name: elasticsearch - check if elasticsearch:9200 is accessible
+      wait_for:
+        host: "{{ item }}"
+        port: 9200
+        state: started
+        delay: 1
+        timeout: 2
+        sleep: 1
+      with_items: 
+        - "{{ groups.es }}"
+      ignore_errors: true
+
+    - name: rocketmq - check if rocketmq:9876 is accessible
+      wait_for:
+        host: "{{ groups.rocketmq[0] }}"
+        port: 9876
+        state: started
+        delay: 1
+        timeout: 2
+        sleep: 1
+      ignore_errors: true
+
+    - name: fastdfs - check if fastdfs:22122 is accessible
+      wait_for:
+        host: "{{ groups.fastdfs[0] }}"
+        port: 22122
+        state: started
+        delay: 1
+        timeout: 2
+        sleep: 1
+      ignore_errors: true
+
+    - name: nginx - check if nginx:443 is accessible
+      wait_for:
+        host: "{{ groups.nginx[0] }}"
+        port: 443
+        state: started
+        delay: 1
+        timeout: 2
+        sleep: 1
+      ignore_errors: true

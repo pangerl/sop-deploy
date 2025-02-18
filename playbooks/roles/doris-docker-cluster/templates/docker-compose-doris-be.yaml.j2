@@ -1,0 +1,21 @@
+version: "3"
+services:
+  be:
+    image: apache/doris:doris-be-2.1.7
+    hostname: be-01
+    network_mode: host
+    environment:
+      - FE_SERVERS=fe1:{{ groups.doris[0] }}::9010
+      - BE_ADDR={{ inventory_hostname }}:9050
+      - TZ=Asia/Shanghai
+    volumes:
+      - /data/doris/be/storage:/opt/apache-doris/be/storage
+      - /data/doris/be.conf:/opt/apache-doris/be/conf/be.conf
+      - /data/doris/be/log:/opt/apache-doris/be/log
+      - /etc/localtime:/etc/localtime
+    extra_hosts:
+      - "be-01:{{ groups.doris[0] }}"
+      - "fe-01:{{ groups.doris[0] }}"
+      - "be-02:{{ groups.doris[1] }}"
+      - "be-03:{{ groups.doris[2] }}"
+

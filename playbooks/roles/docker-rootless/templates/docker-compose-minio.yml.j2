@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  minio:
+    image: docker.io/bitnami/{{ container_image }}
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - MINIO_ROOT_USER=wshoto
+      - MINIO_ROOT_PASSWORD={{ password }}
+      - MINIO_DEFAULT_BUCKETS=wshoto
+      - MINIO_ACCESS_KEY=wZTAhgabhTyqqffMnxQ0
+      - MINIO_SECRET_KEY=GPkwtp6cVjH1ndvFNC6M3O2U8ubnlNY9D40teut1
+    volumes:
+      - '/data/minio/data:/bitnami/minio/data'

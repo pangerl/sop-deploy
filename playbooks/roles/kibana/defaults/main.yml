@@ -1,0 +1,10 @@
+# 镜像名称
+container_name: "kibana"
+container_image: "kibana:7.17.19"
+es_ip: "{{ groups.es[0] }}"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

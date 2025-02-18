@@ -1,0 +1,26 @@
+version: '3'
+
+
+services:
+  tracker:
+    container_name: "{{ tracker_name }}"
+    image: ygqygq2/{{ fastdfs_image }}   
+    network_mode: host
+    volumes:   
+      - {{ working_dir }}/tracker:/var/fdfs    
+    ports:
+      - 22122:22122
+    restart: always
+    command: tracker 
+  storage:
+    container_name: "{{ storage_name }}"
+    image: ygqygq2/{{ fastdfs_image }}
+    network_mode: host  
+    volumes: 
+      - {{ working_dir }}/storage:/var/fdfs
+    environment:
+      - TRACKER_SERVER={{ tracker_ip }}:22122
+    ports:
+      - 8080:8080
+    restart: always
+    command: storage

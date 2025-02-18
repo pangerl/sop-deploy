@@ -1,0 +1,25 @@
+{{ define "email.default.html" }}
+{{- if gt (len .Alerts.Firing) 0 -}}
+{{- range $index, $alert := .Alerts -}}
+========= ERROR ==========<br>
+告警名称：{{ .Labels.alertname }}<br>
+告警级别：{{ .Labels.severity }}<br>
+告警机器：{{ .Labels.instance }} {{ .Labels.device }}<br>
+告警详情：{{ .Annotations.summary }}<br>
+告警时间：{{ (.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}<br>
+========= END ==========<br>
+{{- end }}
+{{- end }}
+{{- if gt (len .Alerts.Resolved) 0 -}}
+{{- range $index, $alert := .Alerts -}}
+========= INFO ==========<br>
+告警名称：{{ .Labels.alertname }}<br>
+告警级别：{{ .Labels.severity }}<br>
+告警机器：{{ .Labels.instance }}<br>
+告警详情：{{ .Annotations.summary }}<br>
+告警时间：{{ (.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}<br>
+恢复时间：{{ (.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}<br>
+========= END ==========<br>
+{{- end }}
+{{- end }}
+{{- end }}

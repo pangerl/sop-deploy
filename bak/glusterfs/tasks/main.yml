@@ -1,0 +1,41 @@
+- name: 传输离线rpm包
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/basic/basic_glusterfs.tar.gz"
+    dest: /opt/kube/packages
+
+- name: 安装前置依赖包
+  yum:
+    name: yum-utils,createrepo
+    state: present
+
+- name: 创建本地yum源
+  shell: createrepo /opt/kube/packages/basic_glusterfs
+
+- name: 拷贝yum源
+  template:
+     src: glusterfs.repo.j2
+     dest: /etc/yum.repos.d/glusterfs.repo
+
+- name: 生成yum缓存
+  shell: yum clean all && yum makecache
+
+- name: 修改host
+  blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} glusterfs"
+    block: |
+      {{ groups.glusterserver[0] }} glusternode01
+      {{ groups.glusterserver[1] }} glusternode02
+      {{ groups.glusterserver[2] }} glusternode03
+
+- block:
+
+  - include: glusterfs-server.yml
+
+  when: "inventory_hostname in groups.glusterserver"
+
+- block:
+
+  - include: glusterfs-client.yml
+
+  when: "inventory_hostname in groups.glusterclient"

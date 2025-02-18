@@ -1,0 +1,35 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+    with_items:
+    - "{{ fastdfs_image }}"
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+    with_items:
+    - "{{ fastdfs_image }}"
+    ignore_errors: true
+    
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- name: copy docker-compose-fdfs.yml.j2 file
+  template: src=docker-compose-fdfs.yml.j2 dest={{ working_dir }}/docker-compose-fdfs.yml mode=075
+  
+- name: remove container
+  shell: docker-compose -f docker-compose-fdfs.yml down
+  args:
+    chdir: "{{ working_dir }}"
+
+- name: create container  
+  shell: docker-compose -f docker-compose-fdfs.yml up -d
+  args:
+    chdir: "{{ working_dir }}"
+   

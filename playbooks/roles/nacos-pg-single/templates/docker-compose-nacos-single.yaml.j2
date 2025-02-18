@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  nacos1:
+    container_name: {{ container_name }}
+    image: ka-tcr.tencentcloudcr.com/middleware/{{ container_image }}
+    network_mode: host
+    volumes:
+      - ./cluster-logs/nacos1:/home/nacos/logs
+    environment:
+      - PREFER_HOST_MODE=hostname
+      - MODE=standalone
+      - NACOS_AUTH_ENABLE=true
+      - SPRING_DATASOURCE_PLATFORM=postgresql
+      - PGSQL_URL=jdbc:postgresql://{{ PG_HOST }}:{{ PG_PORT }}/{{ nacos_db_name }}?tcpKeepAlive=true&reWriteBatchedInserts=true&ApplicationName=nacos_java
+      - PGSQL_USERNAME={{ PG_USER }}
+      - PGSQL_PASSWORD={{ PG_PASSWORD }}
+      - NACOS_AUTH_TOKEN=SecretKey0123456789012345678435847587438758437953748573487543
+      - NACOS_AUTH_IDENTITY_KEY=root
+      - NACOS_AUTH_IDENTITY_VALUE=xxxxxx4
+    restart: always
+ 
+ 
+

@@ -1,0 +1,6 @@
+# [optional] to synchronize system time of nodes with 'chrony' 
+- hosts:
+  - k8s
+  - node
+  roles:
+  - { role: chrony, when: "groups['chrony']|length > 0" }

@@ -1,0 +1,4 @@
+container_name: nacos
+container_tag: "v2.3.0"
+container_file: "nacos-server_{{ container_tag }}"
+container_image: "nacos-server:{{ container_tag }}"

@@ -1,0 +1,75 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- name: create data directory
+  file:
+    path: "{{ working_dir }}/data"
+    state: directory
+    owner: 1001
+    group: 1001
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_file }} dest={{ image_dir }}/{{ container_file }} mode=0644
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+  
+# - name: copy mysql.conf
+#   copy: src=mysql.conf dest={{ working_dir }}/mysql.conf mode=0644
+
+- name: remove container
+  docker_container:
+    name: "{{ container_name }}"
+    state: absent
+
+- name: create mysql-master
+  docker_container:
+    name: "{{ container_name }}"
+    image: "bitnami/{{ container_image }}"
+    pull: "{{ pull }}"
+    shm_size: 1g
+    volumes:
+      - "{{ working_dir }}/data:/bitnami/mysql/data"
+    env:
+        MYSQL_ROOT_PASSWORD: "{{ mysql_password }}"
+        MYSQL_REPLICATION_MODE: "master"
+        MYSQL_REPLICATION_USER: "repl_user"
+        MYSQL_REPLICATION_PASSWORD: "repl_password"
+        MYSQL_USER: "my_user"
+        MYSQL_PASSWORD: "{{ mysql_password }}"
+        #MYSQL_DATABASE: "my_database"
+    ports:
+     - "{{ mysql_port }}:3306"                              #端口映射
+    state: started                              #启动
+    restart_policy: always
+  when: "inventory_hostname == master_ip"
+
+- name: create mysql-slave
+  docker_container:
+    name: "{{ container_name }}"
+    image: "bitnami/{{ container_image }}"
+    pull: "{{ pull }}"
+    shm_size: 1g
+    volumes:
+      - "{{ working_dir }}/data:/bitnami/mysql/data"
+    env:
+        MYSQL_MASTER_ROOT_PASSWORD: "{{ mysql_password }}"
+        MYSQL_REPLICATION_MODE: "slave"
+        MYSQL_REPLICATION_USER: "repl_user"
+        MYSQL_REPLICATION_PASSWORD: "repl_password"
+        MYSQL_MASTER_HOST: "{{ master_ip }}"
+        MYSQL_MASTER_PORT_NUMBER: "{{ mysql_port | int }}"
+    ports:
+     - "{{ mysql_port }}:3306"                              #端口映射
+    state: started                              #启动
+    restart_policy: always
+  when: "inventory_hostname == slave_ip"

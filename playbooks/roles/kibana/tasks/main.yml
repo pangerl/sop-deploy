@@ -1,0 +1,34 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_image }} dest={{ image_dir }}/{{ container_image }} mode=0644
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_image }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- name: copy docker-compose-kibana.yml.j2 file
+  template: src=docker-compose-kibana.yml.j2 dest={{ working_dir }}/docker-compose-kibana.yml mode=0755
+  
+- name: 下载 kibana.yml 文件
+  template: src=kibana.yml.j2 dest={{ working_dir }}/kibana.yml mode=0644
+
+- name: remove container  kibana
+  shell: docker-compose -f docker-compose-kibana.yml down
+  args:
+    chdir: "{{ working_dir }}"
+  ignore_errors: yes
+
+- name: remove container  kibana
+  shell: docker-compose -f docker-compose-kibana.yml up -d
+  args:
+    chdir: "{{ working_dir }}"

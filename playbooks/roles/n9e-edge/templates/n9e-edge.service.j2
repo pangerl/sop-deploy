@@ -1,0 +1,12 @@
+[Unit]
+Description=n9e-edge
+After=network.target
+
+[Service]
+User=root
+Type=simple
+ExecStart={{ working_dir }}/n9e-edge --configs {{ working_dir }}/etc/edge
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+- name: 部署 spark
+  hosts:
+    - spark
+  roles:
+    - java
+    - spark
+  gather_facts: false
+  vars:
+    JAVA_HOME: "/opt/java"
+    SPARK_HOME: "/opt/spark"

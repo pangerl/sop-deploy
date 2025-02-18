@@ -1,0 +1,12 @@
+version: '3.3'
+services:
+  {{ namesrv_name }}:
+    image: apache/{{ namesrv_image }}
+    container_name: {{ namesrv_name }}
+    ports:
+      - "{{ rmqnamesrv_port }}:9876"
+    volumes:
+      - {{ working_dir }}/namesrv/logs:/home/rocketmq/logs
+      - /etc/localtime:/etc/localtime
+    command: sh mqnamesrv
+    restart: always

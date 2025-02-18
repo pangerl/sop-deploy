@@ -1,0 +1,12 @@
+groups:
+- name: port_status
+  rules:
+  - alert: "服务端口告警"
+    expr: probe_success{job="nacos_svc"} == 0
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "应用端口不可达"
+      description: "{{$labels.service}} on {{ $labels.instance }} has down for 3 minute"
+      value: "{{ $value }}"

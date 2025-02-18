@@ -1,0 +1,8 @@
+doris_role: "{%- if inventory_hostname == groups.doris[0] -%} \
+                    master \
+                {%- else -%} \
+                    follower \
+                {%- endif -%}"
+
+container_file_fe: doris-fe-2.1.7 
+container_file_be: doris-be-2.1.7

@@ -1,0 +1,56 @@
+## 组件
+a3.sources=r3 r4
+a3.channels=c3
+a3.sinks=k3
+
+## source
+a3.sources.r3.type=com.wshoto.flume.source.rocketmq.RocketMQSource
+a3.sources.r3.namesrvAddr={{ rocketmq }}
+a3.sources.r3.consumerGroup=flumn-ca-es-chat-data-distribute
+a3.sources.r3.topic=ca-es-chat-data-distribute
+a3.sources.r3.tags=*
+a3.sources.r3.messageModel=CLUSTERING
+a3.sources.r3.maxNums=32
+#a3.sources.r3.initialOffset=earliest
+
+# source2
+a3.sources.r4.type = exec
+a3.sources.r4.command = tail -F {{ flume_home }}/add_partition.txt
+
+
+## channel
+a3.channels.c3.type = memory
+#a3.channels.c3.memoryCapacity = 10000
+#a3.channels.c3.overflowCapacity = 1000000
+#a3.channels.c3.byteCapacity = 80000
+a3.channels.c3.capacity = 100001
+a3.channels.c3.transactionCapacity = 100001 
+a3.channels.c3.keep-alive=3
+#a3.channels.c3.checkpointDir = /hadoop/flume/checkpoint
+#a3.channels.c3.dataDirs = /hadoop/flume/data
+
+## sink
+a3.sinks.k3.type = hdfs
+a3.sinks.k3.hdfs.path = /origin_data/session/%Y%m%d/%H
+a3.sinks.k3.hdfs.filePrefix = conversation-
+a3.sinks.k3.hdfs.round = true
+a3.sinks.k3.hdfs.roundValue = 1
+a3.sinks.k3.hdfs.roundUnit = hour
+a3.sinks.k3.hdfs.useLocalTimeStamp = true
+a3.sinks.k3.hdfs.batchSize = 100
+a3.sinks.k3.hdfs.rollInterval = 60
+a3.sinks.k3.hdfs.rollSize = 134217700
+a3.sinks.k3.hdfs.rollCount = 0
+## 控制输出文件是原生文件
+#a3.sinks.k3.hdfs.fileType=DataStream
+a3.sinks.k3.hdfs.fileType = CompressedStream
+a3.sinks.k3.hdfs.codeC = snappy
+#a3.sinks.k3.hdfs.txnEventMax = 1000
+#a3.sinks.k3.hdfs.callTimeout = 60000
+#a3.sinks.k3.hdfs.appendTimeout = 60000
+
+## 拼装
+a3.sources.r3.channels = c3
+a3.sources.r4.channels = c3
+a3.sinks.k3.channel= c3
+

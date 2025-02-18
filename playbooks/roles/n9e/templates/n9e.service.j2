@@ -1,0 +1,20 @@
+[Unit]
+Description="n9e"
+After=network.target
+
+[Service]
+Type=simple
+
+ExecStart={{ n9e_dir }}/n9e
+WorkingDirectory={{ n9e_dir }}
+
+Restart=on-failure
+SuccessExitStatus=0
+LimitNOFILE=65536
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=n9e
+
+
+[Install]
+WantedBy=multi-user.target

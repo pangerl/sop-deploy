@@ -1,0 +1,22 @@
+- name: 部署 big-app
+  hosts:
+    - big-app
+  roles:
+    - java
+    - big-app
+    - promtail
+    # - proxychains
+  gather_facts: false
+  vars:
+    working_dir: "/data/conversation-2"
+    # 是否安装 promtail 收集日志
+    promtail_enabled: true
+    # loki 服务器的 ip
+    loki_ip: ""
+    # nfs 配置
+    # nfs_server: 172.18.0.17
+    # nfs_mountpoint: /data/nfs_data
+    # 代理配置，可以不配置
+    proxy_ip: '192.168.1.1'
+    proxy_port: '9253'
+    localnet: '172.18.1.0/255.255.255.0'

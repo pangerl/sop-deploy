@@ -1,0 +1,10 @@
+---
+zookeeper_unit_path: /usr/lib/systemd/system/zookeeper.service
+
+zookeeper_id: "{%- if inventory_hostname == groups.kafka[0] -%} \
+                    1 \
+                {%- elif inventory_hostname == groups.kafka[1] -%} \
+                    2 \
+                {%- else -%} \
+                    3 \
+                {%- endif -%}"

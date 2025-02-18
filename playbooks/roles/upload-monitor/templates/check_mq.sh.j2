@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export PATH={{JAVA_HOME}}/bin:$PATH
+cd {{categraf_dir}}/scripts/rocketmq/bin
+count=`./mqadmin clusterList -n {{mq_url}} -m|grep broker|wc -l`
+echo 'mq_broker_count{product="rocketmq"} '${count}''

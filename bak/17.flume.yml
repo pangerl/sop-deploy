@@ -1,0 +1,12 @@
+- name: 部署 flume
+  hosts:
+    - "{{ groups.hdp[1] }}"
+  roles:
+    - java
+    - flume
+  gather_facts: false
+  vars:
+    kafka: "{{ groups.kafka[0] }}:9092"
+    rocketmq: "{{ groups.rocketmq[0] }}:9876"
+    flume_home: '/data/apache-flume'
+    java_home: '/opt/java'

@@ -1,0 +1,59 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}/esdata-init"
+    - "{{ image_dir }}"
+  
+- name: download es_init.zip
+  unarchive:
+    src: "{{ version }}/es_init.zip"
+    dest: "{{ working_dir }}/esdata-init"
+
+- name: copy dumpEsIndexImport.sh file
+  template: src=dumpEsIndexImport.sh.j2 dest={{ working_dir }}/esdata-init/dumpEsIndexImport.sh mode=0775
+
+
+- block:
+  - name: download image {{ container_name }}
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_file }} dest={{ image_dir }}/{{ container_file }} mode=0644
+
+  - name: load image {{ container_name }}
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+
+
+- name: remove container {{ container_name }}
+  docker_container:
+    name: "{{ container_name }}"
+    state: absent
+
+- name: create {{ container_name }}
+  docker_container:
+    interactive: yes
+    name: "{{ container_name }}"
+    image: "taskrabbit/{{ container_image }}"
+    pull: "{{ pull }}"
+    volumes:
+      - "{{ working_dir }}/esdata-init:/data"
+    state: started
+    tty: yes
+    restart_policy: no
+    command: /bin/sh
+
+
+- name: init  {{ container_name }}  data
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: /bin/sh /data/dumpEsIndexImport.sh
+  ignore_errors: true
+  run_once: true
+
+- name: remove container {{ container_name }}
+  docker_container:
+    name: "{{ container_name }}"
+    state: absent

@@ -1,0 +1,73 @@
+- name: Create docker group
+  group:
+    name: "{{ run_user }}"
+    state: present
+    system: yes
+
+- name: Create docker user
+  user:
+    name: "{{ run_user }}"
+    group: "{{ run_user }}"
+    state: present
+    system: yes
+
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+
+- name: 下载 docker-rootless 二进制文件
+  copy: src={{ project_dir }}/packages/binary_tag/docker-rootless/{{ item }} dest=/usr/bin/{{ item }} mode=0755
+  with_items:
+  - containerd
+  - containerd-shim-runc-v2
+  - ctr
+  - docker
+  - dockerd
+  - dockerd-rootless-setuptool.sh
+  - dockerd-rootless.sh
+  - docker-init
+  - docker-proxy
+  - rootlesskit
+  - rootlesskit-docker-proxy
+  - runc
+  - vpnkit
+
+- name: copy docker-rootless start script
+  copy: src=start_docker.sh dest={{ working_dir }}/start_docker.sh  owner={{ run_user }} group={{ run_user }} mode=0644
+
+- name: copy docker-rootless stop script
+  copy: src=stop_docker.sh dest={{ working_dir }}/stop_docker.sh owner={{ run_user }} group={{ run_user }} mode=0644
+
+- name: add sysctl
+  shell: "echo 'user.max_user_namespaces=28633' >> /etc/sysctl.conf &&  sysctl -p"
+
+- name: add uid
+  shell: "echo '{{ run_user }}:100000:65536' >> /etc/subuid && echo '{{ run_user }}:100000:65536' >> /etc/subgid"
+
+- name: add bashrc
+  shell: "echo 'export XDG_RUNTIME_DIR=/home/{{ run_user }}/.docker/run' >> /home/{{ run_user }}/.bashrc &&   echo  'export PATH=/usr/local/bin:$PATH' >> /home/{{ run_user }}/.bashrc && source /home/{{ run_user }}/.bashrc"
+  become: yes
+  become_method: su
+  become_user: "{{ run_user }}"
+
+- name: download docker-compose
+  copy: src={{ project_dir }}/packages/binary_tag/docker-compose-linux-x86_64 dest=/usr/bin/docker-compose mode=0755
+
+- name: install docker-rootless
+  shell: " dockerd-rootless-setuptool.sh install"
+  become: yes
+  become_method: su
+  become_user: "{{ run_user }}"
+
+- name: start docker-rootless
+  shell: "source /home/{{ run_user }}/.bashrc && sh /data/docker/start_docker.sh"
+  become: yes
+  become_method: su
+  become_user: "{{ run_user }}"
+
+
+
+

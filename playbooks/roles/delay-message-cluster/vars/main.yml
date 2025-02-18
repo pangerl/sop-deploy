@@ -1,0 +1,13 @@
+
+naming_image: "wshoto-delay-message-naming:V3PRODHA.3"
+broker_image: "wshoto-delay-message-broker:V3PRODHA.PGSQL.3"
+
+naming_ip: "{{ groups.delay[0] }}"
+
+delay_ip: "{{ inventory_hostname }}"
+
+brokerName: "{%- if inventory_hostname == groups.delay[0] -%} \
+                    broker-1 \
+                {%- else -%} \
+                    broker-2 \
+                {%- endif -%}"

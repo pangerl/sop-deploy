@@ -1,0 +1,46 @@
+- name: 部署 n9e-edge
+  hosts:
+    - n9e_edge
+  roles:
+    - n9e-edge
+  gather_facts: false
+  vars:
+    REDIS_HOST: "{{ groups.redis[0] }}"
+    REDIS_PORT: 6379
+    REDIS_PASSWORD: "Wshoto!@2024"
+    #n9e VM数据库IP
+    victoriametrics: "{{ groups.n9e_edge[0] }}"
+    # 项目名称(重要)
+    project: "基线-sop"
+    working_dir: "/data/n9e-edge"
+    nacos_check_enabled: true
+    # nacos信息
+    nacos_ip_port: "172.18.1.7:8848"
+    nacos_user: "nacos"
+    nacos_password: "nacos"
+    namespaceId: "qw-uat"
+    # 大应用部署需要，k8s部署设置 false
+    #blackbox_enabled: true
+    
+#- name: 修改categraf
+#  hosts:
+#    - k8s
+#    - node
+#    - n9e
+#  vars:
+#    # 项目名称(重要)
+#    project: "基线-sop"
+#  tasks:
+#    - name: Template config.toml.template file to conf
+#      template:
+#        src: config.toml.j2
+#        dest: /opt/categraf/conf/config.toml
+#    - name: Start the categraf service
+#      systemd:
+#        name: categraf.service
+#        state: restarted
+#        enabled: yes
+#    - name: n9e-edge注意事项
+#      debug:
+#        msg:
+#        - "部署n9e-edge前部署保证n9e-server运行正常！"

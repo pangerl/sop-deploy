@@ -1,0 +1,61 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ image_dir }}"
+    - "{{ working_dir }}"
+
+- name: create conf and log directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ working_dir }}/broker/conf"
+    - "{{ working_dir }}/broker/logs"
+    - "{{ working_dir }}/broker/store"
+    - "{{ working_dir }}/namesrv/logs"
+
+- name: 下载 broker.conf 文件
+  template: src=broker.conf.j2 dest={{ working_dir }}/broker/conf/broker.conf mode=0644
+
+- name: copy docker-compose.yml file
+  template: src=rocketmq-docker-compose.yml.j2 dest={{ working_dir }}/rocketmq-docker-compose.yml mode=0755
+
+- name: owner working_dir directory
+  file:
+    path: "{{ working_dir }}"
+    state: directory
+    mode: 0755
+    owner: "3000"
+    group: "3000"
+    recurse: "yes"
+
+- name: remove container
+  shell: docker-compose -f {{ working_dir }}/{{ item }} down --remove-orphans
+  with_items:
+    - "rocketmq-docker-compose.yml"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+    with_items:
+    - "{{ load_namesrv_image }}"
+    - "{{ load_broker_image }}"
+    - "{{ load_dashboard_image }}"
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+    with_items:
+    - "{{ load_namesrv_image }}"
+    - "{{ load_broker_image }}"
+    - "{{ load_dashboard_image }}"
+    ignore_errors: true
+    
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- name: create mqbroker
+  shell: docker-compose -f {{ working_dir }}/{{ item }} up -d
+  with_items:
+    - "rocketmq-docker-compose.yml"

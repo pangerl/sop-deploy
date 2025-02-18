@@ -1,0 +1,56 @@
+
+load_namesrv_image: rocketmq_4.9.8
+load_broker_image: rocketmq_4.9.8
+namesrv_image: rocketmq:4.9.8
+broker_image: rocketmq:4.9.8
+dashboard_image: rocketmq-dashboard:1.0.0
+load_dashboard_image: rocketmq-dashboard:1.0.0
+
+namesrv_name: "rmqnamesrv"
+dashboard_name: "rocketmq-dashboard"
+
+brokerIP: "{{ inventory_hostname }}"
+
+dashboard_ip: "{{ groups.rocketmq[2] }}"
+namesrv_ip_1: "{{ groups.rocketmq[0] }}"
+namesrv_ip_2: "{{ groups.rocketmq[1] }}"
+
+namesrvAddr: "{{ namesrv_ip_1 }}:{{ rmqnamesrv_port }};{{ namesrv_ip_2 }}:{{ rmqnamesrv_port }}"
+
+dashboard_namesrv: "-Drocketmq.namesrv.addr={{ namesrvAddr }} -Dcom.rocketmq.sendMessageWithVIPChannel=false -Dlogging.level.root=off"
+
+java_opt: "-server -Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }}"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"
+
+container_m_name: "broker-master"
+container_s_name: "broker-slave"
+
+broker_name: "{%- if inventory_hostname == groups.rocketmq[0] -%} \
+                broker-a \
+              {%- elif inventory_hostname == groups.rocketmq[1] -%} \
+                broker-b \
+              {%- else -%} \
+                broker-c \
+              {%- endif -%}"
+
+broker_name_s: "{%- if inventory_hostname == groups.rocketmq[0] -%} \
+                broker-c \
+              {%- elif inventory_hostname == groups.rocketmq[1] -%} \
+                broker-a \
+              {%- else -%} \
+                broker-b \
+              {%- endif -%}"
+
+dLegerPeers: "{%- if inventory_hostname == groups.rocketmq[0] -%} \
+                n0-{{ groups.rocketmq[0] }}:{{ m_dLegerPeers }};n1-{{ groups.rocketmq[0] }}:{{ s_dLegerPeers }} \
+              {%- elif inventory_hostname == groups.rocketmq[1] -%} \
+                n0-{{ groups.rocketmq[1] }}:{{ m_dLegerPeers }};n1-{{ groups.rocketmq[1] }}:{{ s_dLegerPeers }} \
+              {%- else -%} \
+                n0-{{ groups.rocketmq[2] }}:{{ m_dLegerPeers }};n1-{{ groups.rocketmq[2] }}:{{ s_dLegerPeers }} \
+              {%- endif -%}"
+

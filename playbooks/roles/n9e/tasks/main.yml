@@ -1,0 +1,20 @@
+
+- import_tasks: victoria.yml
+
+- import_tasks: n9e.yml
+
+#- include: blackbox.yaml
+#  when: blackbox_enabled | bool
+
+##- include: nacos-check.yaml
+#  when: nacos_check_enabled | bool
+
+- name: victoria-metrics web
+  debug:
+    msg:
+    - "VictoriaMetrics WEB：http://{{ local_ip }}:8428"
+
+- name: n9e web
+  debug:
+    msg:
+    - "夜莺 WEB：http://{{ local_ip }}:{{ n9e_port }}"

@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  broker2:
+    container_name: "delay-message-broker-2"
+    image: wshoto.tencentcloudcr.com/qwgj/{{ broker_image }}
+    network_mode: host
+    volumes:
+      - "{{ working_dir }}/wshoto-broker-2:/data/wshoto"
+    environment:
+      - PARAMS=--spring.application.name={{ cluster_name }}-broker-2 --spring.profiles.active=prod --wshoto.delay.broker.brokerName=broker-2 --spring.datasource.url=jdbc:mysql://{{ mysql_ip }}:{{ mysql_port }}/{{ db_name }}?rewriteBatchedStatements=true&stringtype=unspecified&useUnicode=true&characterEncoding=UTF-8&nullCatalogMeansCurrent=true&serverTimezone=CTT --spring.datasource.username={{ mysql_user }} --spring.datasource.password={{ mysql_pw }} --wshoto.delay.broker.brokerIP={{ delay_ip }} --wshoto.delay.broker.listenPort={{ broker_port }} --wshoto.delay.broker.brokerClusterName={{ cluster_name }} --wshoto.delay.broker.namingAddr={{ naming_ip }}:{{ naming_port }} --wshoto.delay.broker.heartBeatSecond=15 --server.port={{ broker_server_port }} --rocketmq.name-server={{ rocketmq }}
+      - JAVA_OPTS=-Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }} -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:CMSFullGCsBeforeCompaction=0 -XX:+CMSClassUnloadingEnabled -XX:-CMSParallelRemarkEnabled -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$LOGS_DIR/jvm_dump.log -Xloggc:$LOGS_DIR/gc.log
+    restart: always

@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.19
+    container_name: kibana
+    restart: always
+    ports:
+      - {{ kibana_port }}:5601
+    volumes:
+      - {{ working_dir }}/kibana.yml:/usr/share/kibana/config/kibana.yml

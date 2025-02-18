@@ -1,0 +1,35 @@
+version: '3'
+services:
+  {{ pgpool_container_name }}:
+    image:  bitnami/{{ pgpool_container_image }}
+    container_name: "{{ pgpool_container_name }}"
+    network_mode: "bridge"
+	shm_size: 1g
+    ports:
+      - {{ pg_pool_port }}:{{ pg_port }}
+    volumes:
+      - /data/postgres/myconf.conf:/opt/bitnami/pgpool/conf/myconf.conf
+    environment:
+      - PGPOOL_USER_CONF_FILE=/opt/bitnami/pgpool/conf/myconf.conf
+      - PGPOOL_MAX_POOL=2
+      - PGPOOL_NUM_INIT_CHILDREN=2000
+      - PGPOOL_CHILD_MAX_CONNECTIONS=5000
+      - PGPOOL_ENABLE_LOG_CONNECTIONS=yes
+      - PGPOOL_BACKEND_NODES=0:pg-0:{{ pg_port }},1:pg-1:{{ pg_port }}
+      - PGPOOL_SR_CHECK_USER=repmgr
+      - PGPOOL_SR_CHECK_PASSWORD=repmgr123
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD={{ pg_password }}
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD={{ pg_password }}
+      - PGPOOL_ENABLE_LOAD_BALANCING=yes
+    restart: always
+    extra_hosts:
+      - "pg-0:{{ pg_0 }}"
+      - "pg-1:{{ pg_1 }}"
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

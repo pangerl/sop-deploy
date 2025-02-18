@@ -1,0 +1,48 @@
+- hosts:
+  - localhost
+  connection: local
+  gather_facts: false
+  vars:
+    PG_HOST: "{{ groups.postgres[0] }}"
+    PG_PORT: 5432
+    PG_USER: "postgres"
+    PG_PASSWORD: "Wshoto!@2024"
+  tasks:
+    - name: Create new databases with names 'n9e'
+      shell: createdb -U {{ PG_USER }} -h {{ PG_HOST }} -p {{ PG_PORT }} n9e
+      run_once: true
+      ignore_errors: True
+      tags:
+        - create_db
+
+    - name: init new databases  'n9e'
+      shell: psql -d n9e -U {{ PG_USER }} -h {{ PG_HOST }} -p {{ PG_PORT }} -f  {{ project_dir }}/packages/sql/n9e_pg.sql
+      run_once: true
+      ignore_errors: True
+
+- hosts:
+    - n9e
+  roles:
+    - n9e
+  gather_facts: false
+  vars:
+    n9e_dir: "/data/n9e"
+    n9e_port: 17000
+    victoria_dir: "/data/victoria"
+    PG_HOST: "{{ groups.postgres[0] }}"
+    PG_PORT: 5432
+    PG_USER: "postgres"
+    PG_PASSWORD: "Wshoto!@2024"
+    REDIS_HOST: "{{ groups.redis[0] }}"
+    REDIS_PORT: 6379
+    REDIS_PASSWORD: "Wshoto!@2024"
+    ## 组件开关, true | false
+    ## 通过nacos获取服务信息
+    #nacos_check_enabled: true
+    ## nacos信息
+    #nacos_ip_port: "172.18.1.7:8848"
+    #nacos_user: "nacos"
+    #nacos_password: "nacos"
+    #namespaceId: "qw-uat"
+    ## 大应用部署需要，k8s部署设置 false
+    #blackbox_enabled: true

@@ -1,0 +1,14 @@
+for ip in $(eval echo \${${1}_ip[@]});doversion: '3.3'
+services:
+  {{ dashboard_name }}:
+    image: apacherocketmq/{{ dashboard_image }}
+    container_name: {{ dashboard_name }}
+    ports:
+      - "{{ dashboard_port }}:8080"
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - {{ working_dir }}/console/logs:/root/logs
+    environment:
+      - JAVA_OPTS=-Drocketmq.namesrv.addr={{ namesrvAddr }} -Dcom.rocketmq.sendMessageWithVIPChannel=false -Dlogging.level.root=off
+      - OPTS=--rocketmq.config.namesrvAddrs={{ namesrvAddr }}
+    restart: always

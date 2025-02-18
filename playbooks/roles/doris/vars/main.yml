@@ -1,0 +1,8 @@
+doris_role: "{%- if inventory_hostname == groups.doris[0] -%} \
+                    master \
+                {%- else -%} \
+                    follower \
+                {%- endif -%}"
+
+
+BACKEND_SQL: '{% for ip in groups.doris -%}ALTER SYSTEM ADD BACKEND "{{ ip }}:9050";{% else %}ALTER SYSTEM ADD BACKEND "127.0.0.1:9050";{%- endfor %}'

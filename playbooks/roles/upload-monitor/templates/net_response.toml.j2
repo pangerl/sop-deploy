@@ -1,0 +1,63 @@
+
+
+[[instances]]
+targets = [
+{% for ip in redis_lst %}
+    "{{ ip }}:{{ redis_port }}",
+{% endfor %}
+]
+
+labels = { product="redis" }
+
+[[instances]]
+targets = [
+{% for ip in mysql_lst %}
+    "{{ ip }}:{{ mysql_port }}",
+{% endfor %}
+]
+
+labels = { product="mysql" }
+
+
+[[instances]]
+targets = [
+{% for ip in pg_lst %}
+    "{{ ip }}:{{ pg_port }}",
+{% endfor %}
+]
+labels = { product="postgresql" }
+
+
+[[instances]]
+targets = [
+{% for ip in delay_lst %}
+    "{{ ip }}:9999",
+{% endfor %}
+]
+
+labels = { product="delay" }
+
+
+{% if dfs_lst|length > 0  %}
+[[instances]]
+targets = [
+{% for ip in dfs_lst %}
+    "{{ ip }}:22122",
+{% endfor %}
+]
+
+labels = { product="fastdfs" }
+{% endif %}
+
+{% if kafka_lst|length > 0 %}
+
+[[instances]]
+targets = [
+{% for ip in kafka_lst %}
+     "{{ ip }}:{{ kafka_port }}",
+{% endfor %}
+]
+labels = { product="kafka" }
+{% endif %}
+
+

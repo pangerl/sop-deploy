@@ -1,0 +1,136 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ image_dir }}"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+    with_items:
+    - "{{ namesrv_image }}"
+    - "{{ broker_image }}"
+    - "{{ dashboard_image }}"
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+    with_items:
+    - "{{ namesrv_image }}"
+    - "{{ broker_image }}"
+    - "{{ dashboard_image }}"
+    ignore_errors: true
+    
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- block:
+
+  - name: remove container
+    docker_container:
+      name: "{{ item }}"
+      state: absent
+    with_items:
+      - "{{ namesrv_name }}"
+      - "{{ dashboard_name }}"
+
+  - name: create conf directory
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - "{{ working_dir }}/namesrv"
+
+  - name: create mqnamesrv
+    docker_container:
+      name: "{{ namesrv_name }}"
+      image: "locklee/{{ namesrv_image }}"
+      pull: "{{ pull }}"
+      volumes:
+        - "{{ working_dir }}/namesrv/store:/root/store"
+        - "{{ working_dir }}/namesrv/logs:/root/logs"
+      ports:
+        - "{{ rmqnamesrv_port }}:9876"
+      state: started
+      restart_policy: always
+      command: sh mqnamesrv
+
+  - name: create dashboard
+    docker_container:
+      name: "{{ dashboard_name }}"
+      image: "apacherocketmq/{{ dashboard_image }}"
+      pull: "{{ pull }}"
+      ports:
+        - "{{ dashboard_port }}:8080"
+      env:
+          NAMESRV_ADDR: "namesrv:9876"
+      state: started
+      restart_policy: always
+      links:
+        - "{{ namesrv_name }}:namesrv"
+    
+  when: "inventory_hostname == namesrv_ip"
+
+- name: remove container
+  docker_container:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ container_m_name }}"
+    - "{{ container_s_name }}"
+
+- name: create conf directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ working_dir }}/broker-m/conf"
+    - "{{ working_dir }}/broker-s/conf"
+
+- name: 下载 broker-m.conf 文件
+  template: src=broker-m.conf.j2 dest={{ working_dir }}/broker-m/conf/broker.conf mode=0644
+
+- name: 下载 broker-s.conf 文件
+  template: src=broker-s.conf.j2 dest={{ working_dir }}/broker-s/conf/broker.conf mode=0644
+
+- name: create mqbroker-m
+  docker_container:
+    name: "{{ container_m_name }}"
+    image: "locklee/{{ broker_image }}"
+    pull: "{{ pull }}"
+    volumes:
+      - "{{ working_dir }}/broker-m/logs:/root/logs"
+      - "{{ working_dir }}/broker-m/store:/root/store"
+      - "{{ working_dir }}/broker-m/conf/broker.conf:/etc/rocketmq/broker.conf"
+    ports:
+      - "{{ m_fastListenPort }}:10909"
+      - "{{ m_listenPort }}:10911"
+      - "{{ m_haListenPort }}:10912"
+      - "{{ m_dLegerPeers }}:40911"
+    env:
+        NAMESRV_ADDR: "{{ namesrv_ip }}:9876"
+        JAVA_OPT_EXT: "-server -Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }}"
+    state: started
+    restart_policy: always
+    command: sh mqbroker -c /etc/rocketmq/broker.conf
+
+- name: create mqbroker-s
+  docker_container:
+    name: "{{ container_s_name }}"
+    image: "locklee/{{ broker_image }}"
+    pull: "{{ pull }}"
+    volumes:
+      - "{{ working_dir }}/broker-s/logs:/root/logs"
+      - "{{ working_dir }}/broker-s/store:/root/store"
+      - "{{ working_dir }}/broker-s/conf/broker.conf:/etc/rocketmq/broker.conf"
+    ports:
+      - "{{ s_fastListenPort }}:11909"
+      - "{{ s_listenPort }}:11911"
+      - "{{ s_haListenPort }}:11912"
+      - "{{ s_dLegerPeers }}:41911"
+    env:
+        NAMESRV_ADDR: "{{ namesrv_ip }}:9876"
+        JAVA_OPT_EXT: "-server -Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }}"
+    state: started
+    restart_policy: always
+    command: sh mqbroker -c /etc/rocketmq/broker.conf

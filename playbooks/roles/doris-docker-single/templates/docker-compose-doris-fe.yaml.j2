@@ -1,0 +1,41 @@
+version: "3"
+services:
+  fe:
+    image: apache/doris:doris-fe-2.1.7
+    hostname: fe-01
+    network_mode: host
+    environment:
+      - FE_SERVERS=fe1:{{ groups.doris[0] }}:9010
+      - FE_ID=1
+      - TZ=Asia/Shanghai
+    volumes:
+      - /data/doris/fe/doris-meta:/opt/apache-doris/fe/doris-meta
+      - /data/doris/fe.conf:/opt/apache-doris/fe/conf/fe.conf
+      - /data/doris/fe/log:/opt/apache-doris/fe/log
+      - /etc/localtime:/etc/localtime
+    extra_hosts:
+      - "be-01:{{ groups.doris[0] }}"
+      - "fe-01:{{ groups.doris[0] }}"
+      - "be-02:{{ groups.doris[1] }}"
+      - "be-03:{{ groups.doris[2] }}"
+
+  be:
+    image: apache/doris:doris-be-2.1.7
+    hostname: be-01
+    network_mode: host
+    environment:
+      - FE_SERVERS=fe1:{{ groups.doris[0] }}::9010
+      - BE_ADDR={{ inventory_hostname }}:9050
+      - TZ=Asia/Shanghai
+    volumes:
+      - /data/doris/be/storage:/opt/apache-doris/be/storage
+      - /data/doris/be.conf:/opt/apache-doris/be/conf/be.conf
+      - /data/doris/be/log:/opt/apache-doris/be/log
+      - /etc/localtime:/etc/localtime
+    extra_hosts:
+      - "be-01:{{ groups.doris[0] }}"
+      - "fe-01:{{ groups.doris[0] }}"
+      - "be-02:{{ groups.doris[1] }}"
+      - "be-03:{{ groups.doris[2] }}"
+    depends_on:
+      - fe

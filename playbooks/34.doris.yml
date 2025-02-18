@@ -1,0 +1,18 @@
+- name: 部署 doris
+  hosts:
+    - doris
+  roles:
+    - java
+    - doris
+  gather_facts: false
+  vars:
+    doris_home: '/data/doris'
+    java_home: '/opt/java'
+    # doris 启动用户
+    doris_user: 'doris'
+    # jvm 配置
+    fe_jvm: "8192m"
+    be_jvm: "8192m"
+    # fe 是否多节点部署，
+    # 默认单点部署，满足大部分场景
+    fe_cluster: false

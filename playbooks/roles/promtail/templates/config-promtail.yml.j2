@@ -1,0 +1,29 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://{{ loki_ip }}:3100/loki/api/v1/push
+
+scrape_configs:
+
+  # - job_name: system
+  #   static_configs:
+  #   - targets:
+  #       - localhost
+  #     labels:
+  #       job: varlogs
+  #       __path__: /var/log/*log
+
+  - job_name: app-log
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        job: applogs
+        __path__: /data/wshoto/logs/*.log
+        # 用于排除要加载的文件。也可以使用通配符模式。
+        # __path_exclude__: /data/wshoto/logs/*[0-9].log

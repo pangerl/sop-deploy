@@ -1,0 +1,95 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}/conf"
+    - "{{ working_dir }}/namesrv"
+    - "{{ working_dir }}/broker"
+    - "{{ image_dir }}"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+    with_items:
+    - "{{ rmqnamesrv_image }}"
+    - "{{ broker_image }}"
+    - "{{ dashboard_image }}"
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+    with_items:
+    - "{{ rmqnamesrv_image }}"
+    - "{{ broker_image }}"
+    - "{{ dashboard_image }}"
+    ignore_errors: true
+    
+  when: "MID_INSTALL_SOURCE == 'offline'"
+
+- name: 下载 namesrv.conf 文件
+  template: src=namesrv.conf.j2 dest={{ working_dir }}/conf/namesrv.conf
+
+- name: 下载 broker.conf 文件
+  template: src=broker.conf.j2 dest={{ working_dir }}/conf/broker.conf
+
+- name: remove container
+  docker_container:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - "rmqnamesrv"
+    - "broker"
+    - "rocketmq-dashboard"
+
+- name: create mqnamesrv
+  docker_container:
+    name: "rmqnamesrv"
+    image: "locklee/{{ namesrv_image }}"
+    pull: "{{ pull }}"
+    volumes:
+      - "{{ working_dir }}/namesrv/store:/root/store"
+      - "{{ working_dir }}/namesrv/logs:/root/logs"
+      - "{{ working_dir }}/conf/namesrv.conf:/etc/rocketmq/namesrv.conf"
+    ports:
+      - "{{ rmqnamesrv_port }}:9876"
+    env:
+        JAVA_OPT_EXT: "-server -Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }}"
+    state: started
+    restart_policy: always
+    command: sh mqnamesrv -c /etc/rocketmq/namesrv.conf
+
+- name: create broker
+  docker_container:
+    name: "broker"
+    image: "locklee/{{ broker_image }}"
+    pull: "{{ pull }}"
+    volumes:
+      - "{{ working_dir }}/broker/logs:/root/logs"
+      - "{{ working_dir }}/broker/store:/root/store"
+      - "{{ working_dir }}/conf/broker.conf:/etc/rocketmq/broker.conf"
+    ports:
+      - "{{ m_fastListenPort }}:10909"
+      - "{{ m_listenPort }}:10911"
+      - "{{ m_haListenPort }}:10912"
+    env:
+        NAMESRV_ADDR: "namesrv:9876"
+        JAVA_OPT_EXT: "-server -Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }}"
+    state: started
+    restart_policy: always
+    command: sh mqbroker -c /etc/rocketmq/broker.conf
+    links:
+      - "rmqnamesrv:namesrv"
+
+- name: create dashboard
+  docker_container:
+    name: "rocketmq-dashboard"
+    image: "apacherocketmq/{{ dashboard_image }}"
+    pull: "{{ pull }}"
+    ports:
+      - "{{ dashboard_port }}:8080"
+    env:
+        NAMESRV_ADDR: "namesrv:9876"
+    state: started
+    restart_policy: always
+    links:
+      - "rmqnamesrv:namesrv"

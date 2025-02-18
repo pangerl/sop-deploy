@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  pg-master:
+    image: bitnami/{{ container_image }}
+    container_name: {{ container_name }}
+    shm_size: 1g
+    ports:
+      - {{ pg_port }}:5432
+    volumes:
+      - {{ working_dir }}/data:/bitnami/postgresql
+      - /etc/localtime:/etc/localtime
+    environment:
+      - POSTGRESQL_MAX_CONNECTIONS=3000
+      - POSTGRESQL_PASSWORD={{ pg_password }}
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_MASTER_HOST={{ master_ip }}
+    restart: always

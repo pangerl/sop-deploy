@@ -1,0 +1,29 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ n9e_dir }}"
+
+- name: download n9e tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/{{ n9e_tgz }}"
+    dest: "{{ n9e_dir }}"
+
+- name: Template n9e config file
+  template:
+    src: config.toml.j2
+    dest: "{{ n9e_dir }}/etc/config.toml"
+    mode: 0644
+
+- name: Template n9e systemd service file
+  template:
+    src: n9e.service.j2
+    dest: "{{ n9e_unit_path }}"
+    mode: 0644
+
+- name: Start the n9e service
+  systemd:
+    name: n9e.service
+    state: started
+    enabled: yes

@@ -1,0 +1,37 @@
+- name: 部署 elasticsearch
+  hosts:
+    - es
+  roles:
+    - java
+    - elasticsearch-cluster
+  vars:
+    # jdk 11
+    jdk_tgz: "openjdk-11+28_linux-x64_bin.tar.gz"
+    jdk_name: "jdk-11"
+    elastic_dir: "/data/elastic"
+    # es http端口 
+    elastic_http_port: "9200"
+    # es tcp端口
+    elastic_tcp_port: "9300"
+    es_user: "elastic"
+    es_password: "Wshoto!@2024"
+    # 不能超过物理内存的一半
+    # es内存占用
+    es_xms: "3g"
+    es_xmx: "3g"
+
+- name: 部署 kibana
+  hosts:
+    - kibana
+  roles:
+    - docker
+    - kibana
+  gather_facts: false
+  vars:
+    # ansible_python_interpreter: /usr/bin/python2
+    working_dir: "/data/elastic"
+    kibana_port: 5601
+    es_http_port: 9200
+    es_user: "elastic"
+    es_password: "Wshoto!@2024"
+    es_ip: "{{ groups.es[0] }}"

@@ -1,0 +1,26 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    project: "{{ project }}"
+    
+scrape_configs:
+
+  - job_name: 'svc_http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx_wshoto]
+    http_sd_configs:
+    - url: http://{{ inventory_hostname }}:8099
+      refresh_interval: 500s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: http://$1/actuator/test
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+remote_write:
+  - url: "{{ writers_url }}"

@@ -1,0 +1,9 @@
+---
+- name: 部署GlusterFS
+  hosts:
+    - glusterserver
+  roles:
+    - glusterfs
+  gather_facts: no
+  vars:
+    working_dir: "/data/brick"

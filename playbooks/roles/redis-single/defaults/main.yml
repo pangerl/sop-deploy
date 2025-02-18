@@ -1,0 +1,12 @@
+# 镜像名称
+container_name: "redis"
+container_tag: "7.0.15"
+container_file: "redis_{{ container_tag }}"
+container_image: "redis:{{ container_tag }}"
+docker_network_name: "redis-tier"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

@@ -1,0 +1,4 @@
+container_name: xxl-job
+container_tag: "V20221015"
+container_file: "wshoto-xxl-job_{{ container_tag }}"
+container_image: "wshoto-xxl-job:{{ container_tag }}"

@@ -1,0 +1,7 @@
+load_mq_image: "rocketmq_5.3.0"
+load_dashboard_image: "rocketmq-dashboard:1.0.0"
+mq_image: "apache/rocketmq:5.3.0"
+dashboard_image: "apacherocketmq/rocketmq-dashboard:1.0.0"
+namesrv_ip: "{{ groups.rocketmq[0] }}"
+namesrvAddr: "{{ namesrv_ip_1 }}:9876"
+java_opt: "-server -Xms{{ broker_jvm_mx }} -Xmx{{ broker_jvm_ms }} -Xmn{{ broker_jvm_mn }}"

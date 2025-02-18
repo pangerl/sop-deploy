@@ -1,0 +1,26 @@
+[
+  {
+    "targets": [
+      "nightingale:17000"
+    ],
+    "labels": {"service": "n9e"}
+  },
+{% if doris_fe|length > 0 %}
+  {
+    "targets": [
+    {% for ip in doris_fe %}
+      "{{ ip }}:18030",
+    {% endfor %}
+    ],
+    "labels": {"group": "fe"}
+  },
+  {
+    "targets": [
+    {% for ip in doris_be %}
+      "{{ ip }}:18040",
+    {% endfor %}
+    ],
+    "labels": {"group": "be"}
+  }
+{% endif %}
+]

@@ -1,0 +1,21 @@
+#!/bin/bash
+back_dir={{ working_dir }}/data/data/backup_data
+# bin_dir=/data/pg/bin
+# pg_ip=127.0.0.1
+# pg_port=5432
+# pg_user=postgres
+mkdir -p $back_dir
+chown -R 1001.root $back_dir
+pg_pw={{ pg_password }}
+cur_time=$(date '+%Y-%m-%d')
+fifteendays_time=$(date -d -15days '+%Y-%m-%d')
+rm -rf $back_dir/pgsql-backup.$fifteendays_time.dump
+echo "Starting Backup PostgreSQL ..."
+# 宿主机操作 --exclude-database=xxl-job 排除指定数据库
+# PGPASSWORD=$pg_pw $bin_dir/pg_dumpall -U $pg_user -h $pg_ip -p $pg_port -f $back_dir/pgsql-backup.$cur_time.dump
+# 容器操作
+docker exec -it {{ container_name }} /bin/bash -c "PGPASSWORD=$pg_pw /opt/bitnami/postgresql/bin/pg_dumpall -U postgres -f /bitnami/postgresql/data/backup_data/pgsql-backup.$cur_time.dump"
+echo "Finish Backup ..."
+
+# 数据恢复
+# PGPASSWORD=xxxxxx2 psql -U postgres -f /bitnami/postgresql/data/dump.sql

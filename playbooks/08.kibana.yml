@@ -1,0 +1,13 @@
+- name: 部署 kibana
+  hosts:
+    - kibana
+  roles:
+    - kibana
+  gather_facts: false
+  vars:
+    working_dir: "/data/elastic"
+    kibana_port: 5601
+    es_http_port: 9200
+    es_user: "elastic"
+    es_password: "Wshoto!@2024"
+    es_ip: "{{ groups.es[0] }}"

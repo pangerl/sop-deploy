@@ -1,0 +1,17 @@
+- name: 部署 redis
+  hosts:
+    - redis
+  roles:
+  - { role: redis-single, when: "REDIS_MODEL == 'single'" }
+  - { role: redis-replication, when: "REDIS_MODEL == 'replication'" }
+  - { role: redis-sentinel, when: "REDIS_MODEL == 'sentinel'" }
+
+  gather_facts: false
+  vars:
+    working_dir: "/data/redis"
+    password: "Wshoto!@2024"
+    redis_port: 6379
+    redis_sentinel_port: 26379
+
+    #是否需要安装Predixy代理（仅哨兵模式支持安装） true/false
+    install_predixy: "false"

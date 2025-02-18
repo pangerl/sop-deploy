@@ -1,0 +1,5 @@
+[CentOS-7]
+name=CentOS-7
+baseurl=http://10.1.71.215
+gpgcheck=0
+enabled=1

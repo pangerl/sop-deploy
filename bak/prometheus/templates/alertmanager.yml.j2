@@ -1,0 +1,20 @@
+global:
+  resolve_timeout: 5m
+templates:
+  - template/*.tmpl
+route:
+  group_by: ['alertname', 'job']
+  group_wait: 45s
+  group_interval: 10m
+  repeat_interval: 3h
+  receiver: 'web.hook.sop'
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+receivers:
+- name: 'web.hook.sop'
+  webhook_configs:
+  - url: 'http://{{ prometheusalert_ip }}:8080/prometheusalert?type=wx&tpl=prometheus-wx&wxurl=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={{ webhook_key }}'

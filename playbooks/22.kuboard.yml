@@ -1,0 +1,12 @@
+- name: 部署 kuboard
+  hosts:
+    - kuboard
+  roles:
+    - kuboard
+  gather_facts: false
+  vars:
+    working_dir: "/data/kuboard"
+    web_port: 8080
+    agent_port: 10081
+    # admin
+    password: "Wshoto!@2024"

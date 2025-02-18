@@ -1,0 +1,6 @@
+[Ambari-2.7.5.0]
+name=Ambari-2.7.5.0
+baseurl=http://hdp101/ambari/centos7/2.7.5.0-72/
+gpgcheck=0
+enabled=1
+priority=1

@@ -1,0 +1,29 @@
+- name: 部署 rocketmq
+  hosts:
+    - rocketmq
+  roles:
+  - { role: rocketmq-single, when: "MQ_MODEL == 'single'" }
+  - { role: rocketmq-cluster, when: "MQ_MODEL == 'cluster'" }
+  gather_facts: false
+  vars:
+    working_dir: "/data/rocketmq"
+    dashboard_port: 8081
+    rmqnamesrv_port: 9876
+    # master
+    m_listenPort: 10911
+    m_fastListenPort: 10909
+    m_haListenPort: 10912
+    m_dLegerPeers: 40911
+    # slave
+    s_listenPort: 11911
+    s_fastListenPort: 11909
+    s_haListenPort: 11912
+    s_dLegerPeers: 41911
+
+    # 堆内存最大大小
+    jvm_mx: "2G"
+    # 堆内存初始大小
+    jvm_ms: "2G"
+    # 堆内存新生代
+    jvm_mn: "1G"
+

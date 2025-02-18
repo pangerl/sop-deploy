@@ -1,0 +1,9 @@
+load_namesrv_image: rocketmq_4.9.8
+load_broker_image: rocketmq_4.9.8
+rmqnamesrv_image: rocketmq:4.9.8
+broker_image: rocketmq:4.9.8
+dashboard_image: rocketmq-dashboard:1.0.0
+load_dashboard_image: rocketmq-dashboard:1.0.0
+
+brokerIP: "{{ inventory_hostname }}"
+# namesrv_ip: "{{ inventory_hostname }}"

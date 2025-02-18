@@ -1,0 +1,68 @@
+- hosts:
+    - k8s
+    - node
+    - n9e
+  roles:
+    - categraf
+    - upload-monitor
+  gather_facts: false
+  vars:
+    categraf_dir: "/opt/categraf"
+    n9e_url: "{{ groups.n9e[0] }}:17000"
+    ibex_url: "{{ groups.n9e[0] }}:20090"
+    writers_url: "http://{{ n9e_url }}/prometheus/v1/write"
+    heartbeat_url: "http://{{ n9e_url }}/v1/n9e/edge/heartbeat"
+    # 项目名称 (支持中文)
+    project: "基线"
+    JAVA_HOME: "/opt/java"
+    #alarm_go监控地址（必须）
+    alarm_go_metric_url: "172.18.0.17:8090"
+    # 中间件账号信息，没有请留空
+    # es
+    es_lst: ["172.18.2.11", "172.18.2.3", "172.18.2.13"]
+    es_port: 9200
+    es_user: "elastic"
+    es_password: "xxxxxx2ES622"
+    # redis
+    redis_lst: ["172.18.2.16"]
+    redis_port: 6379
+    redis_password: "xxxxxx2REDIS622"
+    # mysql
+    mysql_lst: ["172.18.2.16"]
+    mysql_port: 3306
+    mysql_user: "root"
+    mysql_password: "xxxxxxMYSQL622"
+    # pg
+    pg_lst: ["172.18.2.16"]
+    pg_port: 5432
+    pg_user: "postgres"
+    pg_password: "xxxxxx2PG622"
+    # rocketmq
+    # mq_lst: ["172.18.2.11", "172.18.2.3", "172.18.2.13"]
+    mq_url: "10.242.0.238:9876"
+    rocketmq_dashboard: "172.18.2.13:8081"
+    # delay
+    delay_lst: ["172.18.2.9"]
+    # doris
+    doris_fe: ["172.18.2.8", "172.18.2.14", "172.18.2.4"]
+    doris_be: ["172.18.2.8", "172.18.2.14", "172.18.2.4"]
+    # nacos
+    nacos_lst: ["172.18.2.11", "172.18.2.3", "172.18.2.13"]
+    nacos_port: 8848
+    nacos_user: nacos
+    nacos_pw: nacos
+    # xxl-job
+    xxl_lst: ["172.18.2.9"]
+    xxl_port: 7888
+    # fastdfs，没有部署fastdfs，默认留空
+    dfs_lst: []
+    # kafka
+    kafka_lst: []
+    kafka_port: 9092
+    
+    # es
+    TMP_ES_SERVERS: '{% for es in es_lst -%}"http://{{ es }}:{{ es_port }}",{% else %}"http://127.0.0.1:9200"{%- endfor %}'
+    ES_SERVERS: "{{ TMP_ES_SERVERS.rstrip(',') }}"
+    # kafka
+    TMP_KAFKA_SERVERS: '{% for ip in kafka_lst -%}"{{ ip }}:{{ kafka_port }}",{% else %}"127.0.0.1:9092"{%- endfor %}'
+    KAFKA_SERVERS: "{{ TMP_KAFKA_SERVERS.rstrip(',') }}"

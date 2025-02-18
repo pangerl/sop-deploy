@@ -1,0 +1,48 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_image }} dest={{ image_dir }}/{{ container_image }} mode=0644
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_image }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+  
+- name: copy postgresql.conf
+  copy: src=postgresql.conf dest={{ working_dir }}/postgresql.conf mode=0644
+
+- name: remove container
+  docker_container:
+    name: "{{ container_name }}"
+    state: absent
+
+- name: create container
+  docker_container:
+    name: "{{ container_name }}"
+    image: "{{ container_image }}"
+    pull: "{{ pull }}"
+    shm_size: 1g
+    volumes:
+      - "{{ working_dir }}/data:/var/lib/postgresql/data"
+      - "{{ working_dir }}/postgresql.conf:/etc/postgresql/postgresql.conf"
+    env:
+        POSTGRES_USER: "{{ pg_user }}"
+        POSTGRES_PASSWORD: "{{ pg_password }}"
+        PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+     - "{{ pg_port }}:5432"                              #端口映射
+    state: started                              #启动
+    restart_policy: always
+
+- name: custom config
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: /bin/bash -c "config_file=/etc/postgresql/postgresql.conf"

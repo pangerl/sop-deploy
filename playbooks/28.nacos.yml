@@ -1,0 +1,32 @@
+- hosts:
+  - localhost
+  connection: local
+  gather_facts: false
+  vars:
+    MYSQL_HOST: "{{ groups.mysql[0] }}"
+    MYSQL_PORT: 3306
+    MYSQL_USER: "root"
+    MYSQL_PASSWORD: "Wshoto!@2024"
+    nacos_db_name: "nacos_config"
+  tasks:
+    - name: Create new databases with names 'nacos_config'
+      shell: mysql -h{{ MYSQL_HOST }} -P{{ MYSQL_PORT }} -u{{ MYSQL_USER }} -p'{{ MYSQL_PASSWORD }}' -e 'create database if not exists `{{ nacos_db_name }}`;use {{ nacos_db_name }};source {{ project_dir }}/packages/sql/nacos_config.sql;'
+      run_once: true
+      ignore_errors: True
+      tags:
+        - create_db
+
+- name: 部署 nacos
+  hosts:
+    - nacos
+  roles:
+  - { role: nacos-single, when: "NACOS_MODEL == 'single'" }
+  - { role: nacos-cluster, when: "NACOS_MODEL == 'cluster'" }
+  gather_facts: false
+  vars:
+    MYSQL_HOST: "{{ groups.mysql[0] }}"
+    MYSQL_PORT: 3306
+    MYSQL_USER: "root"
+    MYSQL_PASSWORD: "Wshoto!@2024"
+    nacos_db_name: "nacos_config"
+    working_dir: "/data/nacos"

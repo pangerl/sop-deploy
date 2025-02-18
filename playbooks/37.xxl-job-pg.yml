@@ -1,0 +1,12 @@
+- name: 部署 xxl-job
+  hosts:
+    - xxl_job
+  roles:
+    - xxl-job-pg
+  gather_facts: false
+  vars:
+    PG_HOST: "{{ groups.postgres[0] }}"
+    PG_PORT: 5432
+    PG_USER: "postgres"
+    PG_PASSWORD: "Wshoto!@2024"
+    working_dir: "/data/xxl-job"

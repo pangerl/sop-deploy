@@ -1,0 +1,186 @@
+- name: download image
+  copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+  with_items:
+  - "{{ load_mq_image }}"
+  ignore_errors: true
+
+- name: load image
+  shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+  with_items:
+  - "{{ load_mq_image }}"
+  ignore_errors: true
+
+- block:
+
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+    with_items:
+    - "{{ load_dashboard_image }}"
+    ignore_errors: true
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+    with_items:
+    - "{{ load_dashboard_image }}"
+    ignore_errors: true
+
+  when: "inventory_hostname == groups.rocketmq[2]"
+
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ image_dir }}"
+    - "{{ working_dir }}"
+
+- name: copy users.properties 文件
+  template: src=users.properties dest={{ working_dir }}/users.properties mode=0755
+  
+- name: create conf directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ working_dir }}/namesrv/logs"
+    - "{{ working_dir }}/namesrv/dledgerController"
+    - "{{ working_dir }}/console/logs"
+
+- block:
+
+  - name: create conf directory
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0755
+    with_items:
+      - "{{ working_dir }}/broker-a0/conf"
+      - "{{ working_dir }}/broker-a0/logs"
+      - "{{ working_dir }}/broker-a0/store"
+      - "{{ working_dir }}/broker-b1/conf"
+      - "{{ working_dir }}/broker-b1/logs"
+      - "{{ working_dir }}/broker-b1/store"
+
+  when: "inventory_hostname == groups.rocketmq[0]"
+
+- block:
+
+  - name: create conf directory
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0755
+    with_items:
+      - "{{ working_dir }}/broker-a1/conf"
+      - "{{ working_dir }}/broker-a1/logs"
+      - "{{ working_dir }}/broker-a1/store"
+      - "{{ working_dir }}/broker-b0/conf"
+      - "{{ working_dir }}/broker-b0/logs"
+      - "{{ working_dir }}/broker-b0/store"
+
+  when: "inventory_hostname == groups.rocketmq[1]"
+
+- name: copy namesrv.conf file
+  template: src=namesrv.conf.j2 dest={{ working_dir }}/namesrv.conf mode=0755
+
+- block:
+
+  - name: copy docker-compose-console.yml file
+    template: src=docker-compose-console.yml.j2 dest={{ working_dir }}/docker-compose-console.yml mode=0755
+
+  when: "inventory_hostname == groups.rocketmq[2]"
+
+- block:
+
+  - name: copy broker-a0.conf 文件
+    template: src=broker-a0.conf.j2 dest={{ working_dir }}/broker-a0.conf mode=0644
+
+  - name: copy broker-b1.conf 文件
+    template: src=broker-b1.conf.j2 dest={{ working_dir }}/broker-b1.conf mode=0644
+
+  - name: copy rmq-proxy0.json 文件
+    template: src=rmq-proxy0.json.j2 dest={{ working_dir }}/rmq-proxy0.json mode=0644
+
+  - name: copy rmq-proxy1.json 文件
+    template: src=rmq-proxy1.json.j2 dest={{ working_dir }}/rmq-proxy1.json mode=0644
+
+  - name: copy docker-compose-brokera0.yml file
+    template: src=docker-compose-brokera0.yml.j2 dest={{ working_dir }}/docker-compose-brokera0.yml mode=0755
+
+  - name: copy docker-compose-brokerb1.yml file
+    template: src=docker-compose-brokerb1.yml.j2 dest={{ working_dir }}/docker-compose-brokerb1.yml mode=0755
+
+  when: "inventory_hostname == groups.rocketmq[0]"
+
+- block:
+
+  - name: copy broker-a1.conf 文件
+    template: src=broker-a1.conf.j2 dest={{ working_dir }}/broker-a1.conf mode=0644
+
+  - name: copy broker-b0.conf 文件
+    template: src=broker-b0.conf.j2 dest={{ working_dir }}/broker-b0.conf mode=0644
+
+  - name: copy rmq-proxy0.json 文件
+    template: src=rmq-proxy0.json.j2 dest={{ working_dir }}/rmq-proxy0.json mode=0644
+
+  - name: copy rmq-proxy1.json 文件
+    template: src=rmq-proxy1.json.j2 dest={{ working_dir }}/rmq-proxy1.json mode=0644
+
+  - name: copy docker-compose-brokera1.yml file
+    template: src=docker-compose-brokera1.yml.j2 dest={{ working_dir }}/docker-compose-brokera1.yml mode=0755
+
+  - name: copy docker-compose-brokerb0.yml file
+    template: src=docker-compose-brokerb0.yml.j2 dest={{ working_dir }}/docker-compose-brokerb0.yml mode=0755
+
+  when: "inventory_hostname == groups.rocketmq[1]"
+
+- name: copy docker-compose-namesrv.yml file
+  template: src=docker-compose-namesrv.yml.j2 dest={{ working_dir }}/docker-compose-namesrv.yml mode=0755
+
+- name: owner working_dir directory
+  file:
+    path: "{{ working_dir }}"
+    state: directory
+    mode: 0755
+    owner: "3000"
+    group: "3000"
+    recurse: "yes"
+
+- name: create namesrv container
+  shell: docker-compose -f {{ working_dir }}/docker-compose-namesrv.yml up -d
+
+- block:
+
+  - name: create brokera0 container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-brokera0.yml up -d
+
+  when: "inventory_hostname == groups.rocketmq[0]"
+
+- block:
+
+  - name: create brokera1 container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-brokera1.yml up -d
+
+  when: "inventory_hostname == groups.rocketmq[1]"
+
+- block:
+
+  - name: create brokerb0 container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-brokerb0.yml up -d
+
+  when: "inventory_hostname == groups.rocketmq[1]"
+
+- block:
+
+  - name: create brokerb1 container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-brokerb1.yml up -d
+
+  when: "inventory_hostname == groups.rocketmq[0]"
+
+- block:
+
+  - name: create dashboard container
+    shell: docker-compose -f {{ working_dir }}/docker-compose-console.yml up -d
+
+  when: "inventory_hostname == groups.rocketmq[2]"

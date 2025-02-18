@@ -1,0 +1,27 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- name: download image
+  copy: src={{ project_dir }}/packages/middle_img/{{ container_file }} dest={{ image_dir }}/{{ container_file }} mode=064
+
+- name: load image
+  shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file }}
+  ignore_errors: true
+
+- name: copy docker-compose-nacos-cluster.yaml file
+  template: src=docker-compose-nacos-cluster.yaml.j2 dest={{ working_dir }}/docker-compose-nacos-cluster.yaml mode=0755
+
+- name: remove container  {{ container_name }}
+  shell: docker-compose -f docker-compose-nacos-cluster.yaml down 
+  args:
+    chdir: "{{ working_dir }}"
+
+- name: create container  {{ container_name }}
+  shell: docker-compose -f docker-compose-nacos-cluster.yaml up -d
+  args:
+    chdir: "{{ working_dir }}"

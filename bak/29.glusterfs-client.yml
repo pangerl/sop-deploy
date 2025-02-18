@@ -1,0 +1,9 @@
+---
+- name: 部署GlusterFS
+  hosts:
+    - glusterclient
+  roles:
+    - glusterfs
+  gather_facts: no
+  vars:
+    mount_dir: "/data/wshoto"

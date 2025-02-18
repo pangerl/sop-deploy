@@ -1,0 +1,36 @@
+## 组件
+a1.sources=r1
+a1.channels=c1
+a1.sinks=k1
+
+## source1
+a1.sources.r1.type = org.apache.flume.source.kafka.KafkaSource
+a1.sources.r1.batchSize = 500
+a1.sources.r1.batchDurationMillis = 200
+a1.sources.r1.kafka.bootstrap.servers = {{ kafka }}
+a1.sources.r1.kafka.topics=topic-event
+a1.sources.r1.kafka.consumer.group.id = topic-event_flume_consumer3
+a1.sources.r1.kafka.consumer.auto.offset.reset = earliest
+
+## channel1
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 10000
+a1.channels.c1.transactionCapacity = 500
+
+## sink1
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = /origin_data/log/topic_event/%Y-%m-%d/%H
+a1.sinks.k1.hdfs.filePrefix = log-
+a1.sinks.k1.hdfs.round = true
+a1.sinks.k1.hdfs.rollInterval = 240
+a1.sinks.k1.hdfs.rollSize = 104857600
+a1.sinks.k1.hdfs.rollCount = 0
+## 控制输出文件是原生文件
+#a1.sinks.k1.hdfs.fileType=DataStream
+a1.sinks.k1.hdfs.fileType = CompressedStream
+a1.sinks.k1.hdfs.codeC = snappy
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+
+## 拼装
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel= c1

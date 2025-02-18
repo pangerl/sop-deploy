@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  naming:
+    container_name: "delay-message-naming"
+    image: wshoto.tencentcloudcr.com/qwgj/{{ naming_image }}
+    network_mode: host
+    volumes:
+      - "{{ working_dir }}:/data/wshoto"
+    environment:
+      - PARAMS=--spring.profiles.active=prod --wshoto.naming.server.port={{ naming_port }} --server.port={{ naming_server_port }}
+      - JAVA_OPTS=-Xms4G -Xmx4G -Xmn2G -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:CMSFullGCsBeforeCompaction=0 -XX:+CMSClassUnloadingEnabled -XX:-CMSParallelRemarkEnabled -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$LOGS_DIR/jvm_dump.log -Xloggc:$LOGS_DIR/gc.log
+    restart: always
+
+  broker:
+    container_name: "delay-message-broker-1"
+    image: wshoto.tencentcloudcr.com/qwgj/{{ broker_image }}
+    network_mode: host
+    volumes:
+      - "{{ working_dir }}/wshoto-broker-1:/data/wshoto"
+    environment:
+      - PARAMS=-spring.application.name={{ cluster_name }}-broker-1 --spring.profiles.active=prod  --spring.datasource.driver-class-name=org.postgresql.Driver  --spring.datasource.url=jdbc:postgresql://{{ pg_ip }}:{{ pg_port }}/{{ db_name }}?stringtype=unspecified&useUnicode=true&characterEncoding=UTF-8 --spring.datasource.username={{ pg_user }} --spring.datasource.password={{ pg_pw }} --wshoto.delay.broker.brokerName=broker-1 --wshoto.delay.broker.brokerIP={{ delay_ip }} --wshoto.delay.broker.listenPort={{ broker_port }} --wshoto.delay.broker.brokerClusterName={{ cluster_name }} --wshoto.delay.broker.namingAddr={{ groups.delay[0] }}:{{ naming_port }} --wshoto.delay.broker.heartBeatSecond=15 --server.port={{ broker_server_port }} --rocketmq.name-server={{ rocketmq }}
+      - JAVA_OPTS=-Xms{{ jvm_ms }} -Xmx{{ jvm_mx }} -Xmn{{ jvm_mn }} -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:CMSFullGCsBeforeCompaction=0 -XX:+CMSClassUnloadingEnabled -XX:-CMSParallelRemarkEnabled -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$LOGS_DIR/jvm_dump.log -Xloggc:$LOGS_DIR/gc.log
+    restart: always

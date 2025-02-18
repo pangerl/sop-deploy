@@ -1,0 +1,22 @@
+- name: 部署 kafka
+  hosts:
+    - "{{ groups.kafka[0] }}"
+  roles:
+  - kafka-single
+  gather_facts: false
+  vars:
+    working_dir: "/data/kafka"
+    kafka_port: 9092
+    kafdrop_port: 9000
+    kafka_log_retention_hours: 120
+
+
+- name: 部署 kafdrop
+  hosts:
+    - kafdrop
+  roles:
+  - kafdrop
+  vars:
+    kafka_port: 9092
+    kafdrop_port: 9000
+    kafka_ip: "{{ inventory_hostname }}"

@@ -1,0 +1,29 @@
+- hosts:
+    - n9e
+    - hdp
+  roles:
+    - upload-monitor
+  gather_facts: false
+  vars:
+    # 中间件账号信息,ip默认读取hosts的,如果是云组件,注意修改
+    es_user: "elastic"
+    es_password: "Wshoto!@2024"
+    redis_password: "Wshoto!@2024"
+    mysql_user: "root"
+    mysql_password: "Wshoto!@2024"
+    pg_user: "postgres"
+    pg_password: "Wshoto!@2024"
+    #doris信息
+    doris_ip: "{{ groups.doris[0] }}"
+    doris_port: "9093"
+    doris_user: "root"
+    doris_passwd: "Wshoto!@2024"
+    # rocketmq-dashboard信息
+    rocketmq_dashboard: "172.18.1.3:8081"
+    # 非自建中间件(云组件)，需要填写
+    kafka_ip: "{{ groups.hdp[0] }}"
+    mysql_ip: "{{ groups.mysql[0] }}"
+    es_ip: ""
+    redis_ip: ""
+    pg_ip: ""
+    nacos_ip: ""

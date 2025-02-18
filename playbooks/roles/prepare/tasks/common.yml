@@ -1,0 +1,37 @@
+# 禁用系统swap
+- name: 禁用系统 swap
+  shell: "swapoff -a && sysctl -w vm.swappiness=0"
+  ignore_errors: true
+
+- name: 删除fstab swap 相关配置
+  lineinfile:
+    path: /etc/fstab
+    regexp: 'swap'
+    state: absent
+    backup: 'yes'
+
+- name: 设置系统参数
+  template: src=95-sysctl.conf.j2 dest=/etc/sysctl.d/95-sysctl.conf
+
+- name: 生效系统参数
+  shell: "sysctl -p /etc/sysctl.d/95-sysctl.conf"
+  ignore_errors: true
+
+# 设置系统 ulimits
+- name: 创建 systemd 配置目录
+  file: name=/etc/systemd/system.conf.d state=directory  
+
+- name: 设置系统 ulimits
+  template: src=30-ulimits.conf.j2 dest=/etc/systemd/system.conf.d/30-ulimits.conf
+
+- name: 设置系统文件数
+  blockinfile:
+    path: "/etc/security/limits.conf"
+    insertafter: 'EOF'
+    block: |
+      * soft nofile 100001
+      * hard nofile 100002
+      * soft nproc 100001
+      * hard nproc 100002
+      root soft nofile 100001
+      root hard nofile 100002

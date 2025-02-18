@@ -1,0 +1,60 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- name: create data directory
+  file:
+    path: "{{ working_dir }}/data"
+    state: directory
+    owner: 1001
+    group: 1001
+
+- block:
+  - name: download image
+    copy: src={{ project_dir }}/packages/middle_img/{{ container_file }} dest={{ image_dir }}/{{ container_file }} mode=0644
+
+  - name: load image
+    shell: /usr/bin/docker load -i {{ image_dir }}/{{ container_file }}
+    ignore_errors: true
+
+  when: "MID_INSTALL_SOURCE == 'offline'"
+  
+# - name: copy postgresql.conf
+#   copy: src=postgresql.conf dest={{ working_dir }}/postgresql.conf mode=0644
+
+
+- name: copy docker-compose-pg-master.yml file
+  template: src=docker-compose-pg-master.yml.j2 dest={{ working_dir }}/docker-compose-pg-master.yml mode=0755
+  when: "inventory_hostname == master_ip"
+
+- name: remove container {{ container_name }}
+  shell: docker-compose -f docker-compose-pg-master.yml down
+  args:
+    chdir: "{{ working_dir }}"
+  when: "inventory_hostname == master_ip"
+
+- name: create postgresql-master
+  shell: docker-compose -f docker-compose-pg-master.yml up -d
+  args:
+    chdir: "{{ working_dir }}"
+  when: "inventory_hostname == master_ip"
+
+- name: copy docker-compose-pg-slave.yml file
+  template: src=docker-compose-pg-slave.yml.j2 dest={{ working_dir }}/docker-compose-pg-slave.yml mode=0755
+  when: "inventory_hostname == slave_ip"
+  
+- name: remove container {{ container_name }}
+  shell: docker-compose -f docker-compose-pg-slave.yml down
+  args:
+    chdir: "{{ working_dir }}"
+  when: "inventory_hostname == slave_ip"
+
+- name: create postgresql-slave
+  shell: docker-compose -f docker-compose-pg-slave.yml up -d
+  args:
+    chdir: "{{ working_dir }}"
+  when: "inventory_hostname == slave_ip"

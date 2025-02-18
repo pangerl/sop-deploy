@@ -1,0 +1,13 @@
+- hosts:
+    - "{{ groups.doris[-1] }}"
+  roles:
+    - java
+    - bigdata-app2
+  gather_facts: false
+  vars:
+    bigdata_app_home: "/data/bigdata2.0"
+    # 中间件信息
+    nacos_ip_port: "10.10.44.247:30006"
+    nacos_user: "nacos"
+    nacos_passwd: "nacos"
+

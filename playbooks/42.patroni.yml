@@ -1,0 +1,15 @@
+- name: 部署 patroni 集群
+  hosts:
+    - patroni
+  roles:
+    - chrony
+    - etcd
+    - patroni
+
+  gather_facts: false
+  vars:
+    data_dir: "/data/pgsql"
+    # 默认用户 postgres
+    pg_password: "Wshoto!@2024"
+    # pg 高可用端口
+    haproxy_port: 5000

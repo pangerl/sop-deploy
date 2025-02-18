@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  broker-b0:
+    image: {{ mq_image }}
+    container_name: broker-b0
+    ports:
+      - 10909:10909
+      - 10911:10911
+      - 10912:10912
+      - 8080:8080
+      - 8081:8081
+    environment:
+      - NAMESRV_ADDR={{ namesrvAddr }}
+      - JAVA_OPT_EXT={{ java_opt }}
+    volumes:
+      - {{ working_dir }}/broker-b0/logs:/home/rocketmq/logs
+      - {{ working_dir }}/broker-b0/store:/home/rocketmq/store
+      - {{ working_dir }}/broker-b0.conf:/opt/rocketmq-5.3.0/conf/broker.conf
+      - {{ working_dir }}/rmq-proxy0.json:/opt/rocketmq-5.3.0/conf/rmq-proxy.json
+      - /etc/localtime:/etc/localtime
+    command: sh mqbroker --enable-proxy -pc /opt/rocketmq-5.3.0/conf/rmq-proxy.json -c /opt/rocketmq-5.3.0/conf/broker.conf
+    restart: always

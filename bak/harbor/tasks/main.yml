@@ -1,0 +1,65 @@
+- name: 创建 data_dir 目录
+  file:
+    path: "{{ data_dir }}"
+    state: directory
+    mode: 0755
+
+# 注册变量 result，如果 data_dir 目录下存在 registry 目录说明已经安装过 harbor，则不进行安装
+- name: 注册变量 result
+  command: "ls {{ data_dir }}"
+  register: result
+
+- block:
+  # - name: 生成 harbor 随机密码
+  #   shell: < /dev/urandom tr -dc 0-9A-Za-z-_ | head -c 16
+  #   register: harbor_password_gen
+  
+  # - debug: var="harbor_password_gen.stdout"
+  
+  - name: 生成 DB 随机密码
+    shell: < /dev/urandom tr -dc 0-9A-Za-z-_ | head -c 16
+    register: db_password_gen
+  
+  - debug: var="db_password_gen.stdout"
+  
+  # - name: 下发 docker compose 二进制文件
+  #   copy: src={{ base_dir }}/bin/docker-compose dest={{ bin_dir }}/docker-compose mode=0755
+
+  - name: 下发 harbor 离线安装包
+    copy:
+      src: "{{ project_dir }}/packages/binary_tag/harbor-offline-installer-{{ HARBOR_VER }}.tgz"
+      dest: "{{ data_dir }}/harbor-offline-installer-{{ HARBOR_VER }}.tgz"
+
+  - name: 解压 harbor 离线安装包
+    # shell: "cd {{ data_dir }} && tar zxf harbor-offline-installer-{{ HARBOR_VER }}.tgz"
+    unarchive:
+      src: "{{ data_dir }}/harbor-offline-installer-{{ HARBOR_VER }}.tgz"
+      dest: "{{ data_dir }}"
+      creates: "{{ data_dir }}/harbor"
+      remote_src: yes
+
+  - name: 导入 harbor 所需 docker images
+    shell: "{{ bin_dir }}/docker load -i {{ data_dir }}/harbor/harbor.{{ HARBOR_VER }}.tar.gz"
+  
+  - name: 准备 harbor 配置文件
+    template: src=harbor-{{ HARBOR_VER_MAIN }}.yml.j2 dest={{ data_dir }}/harbor/harbor.yml
+
+  - set_fact: HARBOR_INST_OPS="{{ HARBOR_INST_OPS }} --with-chartmuseum"
+    when: "HARBOR_WITH_CHARTMUSEUM|bool"
+
+  - set_fact: HARBOR_INST_OPS="{{ HARBOR_INST_OPS }} --with-notary" 
+    when: "HARBOR_WITH_NOTARY|bool"
+
+  - set_fact: HARBOR_INST_OPS="{{ HARBOR_INST_OPS }} --with-trivy"
+    when: "HARBOR_WITH_TRIVY|bool"
+
+  - set_fact: HARBOR_INST_OPS="{{ HARBOR_INST_OPS }} --with-clair"
+    when: "HARBOR_WITH_CLAIR|bool"
+
+  - debug: var="HARBOR_INST_OPS"
+
+  - name: 安装 harbor
+    shell: "cd {{ data_dir }}/harbor && \
+            export PATH={{ bin_dir }}:$PATH && \
+            ./install.sh {{ HARBOR_INST_OPS }} >> /tmp/harbor-`date +'%Y%m%d%H%M%S'`.log 2>&1"
+  when: '"registry" not in result.stdout'

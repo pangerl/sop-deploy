@@ -1,0 +1,24 @@
+brokerClusterName = DefaultCluster
+brokerName = {{ broker_name_s }}
+namesrvAddr = {{ namesrvAddr }}
+brokerId = 1
+brokerIP1 = {{ brokerIP }}
+autoCreateTopicEnable = true
+autoCreateSubscriptionGroup = true
+listenPort = 11911
+fastListenPort = 11909
+haListenPort = 11912
+deleteWhen = 04
+fileReservedTime = 72
+mapedFileSizeCommitLog = 1073741824
+diskMaxUsedSpaceRatio = 88
+maxMessageSize = 65536
+brokerRole = SLAVE
+flushDiskType = ASYNC_FLUSH
+laneSupport = true
+
+# dleger
+#enableDLegerCommitLog = true
+#dLegerGroup = {{ broker_name }}
+#dLegerSelfId = n1
+#dLegerPeers = {{ dLegerPeers }}

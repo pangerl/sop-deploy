@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "doris_check  be_count="`mysql -h {{ doris_ip }} -P{{ doris_port }} -u{{ doris_user }} -p'{{ doris_passwd }}' -e "SHOW BACKENDS\G" |grep Alive |grep true |wc -l`""
+echo "doris_check  fe_count="`mysql -h {{ doris_ip }} -P{{ doris_port }} -u{{ doris_user }} -p'{{ doris_passwd }}' -e "SHOW FRONTENDS\G" |grep Alive |grep true |wc -l`""

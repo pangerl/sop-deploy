@@ -1,0 +1,38 @@
+
+- name: download alertmanager tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/{{ alertmanager_package }}"
+    dest: "{{ data_root_dir }}"
+    creates: "{{ data_root_dir }}/{{ alertmanager_package.split('.t')[0] }}"
+
+- name: 配置 alertmanager 软链接
+  file: 
+    src: "{{ data_root_dir }}/{{ alertmanager_package.split('.t')[0] }}"
+    dest: "{{ alertmanager_dir }}"
+    state: link
+    force: yes
+  ignore_errors: true
+
+- name: Template alertmanager config file
+  template:
+    src: alertmanager.yml.j2
+    dest: "{{ alertmanager_dir }}/alertmanager.yml"
+    mode: 0644
+
+- name: copy directory for template
+  copy:
+    src: template
+    dest: "{{ alertmanager_dir }}"
+    mode: 0644
+
+- name: Template alertmanager systemd service file
+  template:
+    src: alertmanager.service.j2
+    dest: "{{ alertmanager_unit_path }}"
+    mode: 0644
+
+- name: Start the alertmanager service
+  systemd:
+    name: alertmanager.service
+    state: started
+    enabled: yes

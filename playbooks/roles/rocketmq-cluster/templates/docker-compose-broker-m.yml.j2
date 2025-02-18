@@ -1,0 +1,20 @@
+version: '3.3'
+services:
+  {{ container_m_name }}:
+    image: apache/{{ broker_image }}
+    container_name: {{ container_m_name }}
+    volumes:
+      - {{ working_dir }}/broker-m/logs:/home/rocketmq/logs
+      - {{ working_dir }}/broker-m/store:/home/rocketmq/store
+      - {{ working_dir }}/broker-m/conf/broker.conf:/opt/rocketmq-4.9.8/conf/broker.conf
+      - /etc/localtime:/etc/localtime
+    command: sh mqbroker -c /opt/rocketmq-4.9.8/conf/broker.conf
+    environment:
+      - JAVA_OPT_EXT={{ java_opt }}
+      - NAMESRV_ADDR={{ namesrvAddr }}
+    ports:
+      - "{{ m_fastListenPort }}:10909"
+      - "{{ m_listenPort }}:10911"
+      - "{{ m_haListenPort }}:10912"
+      - "{{ m_dLegerPeers }}:40911"
+    restart: always

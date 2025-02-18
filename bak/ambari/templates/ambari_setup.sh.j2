@@ -1,0 +1,32 @@
+#!/bin/bash
+port={{ MYSQL_PORT }}
+username={{ MYSQL_USER }}
+password={{ MYSQL_PASSWORD }}
+java_home=/opt/java
+hostname={{ MYSQL_HOST }}
+
+setup_ambari() {
+  yum -y install expect >/dev/null 2>&1
+  expect -c "
+      set timeout -1;
+      spawn ambari-server setup;
+      expect {
+          Customize*                                                    {send -- y\r;exp_continue;}
+          daemon*                                                       {send -- \r;exp_continue;}
+          change*                                                       {send -- y\r;exp_continue;}
+          \(1\)*                                                       {send -- 2\r;exp_continue;}
+          JAVA_HOME*                                                    {send -- $java_home\r;exp_continue;}
+          packages*                                                     {send -- n\r;exp_continue;}
+          configuration*                                                {send -- y\r;exp_continue;}
+          \(3\)*                                                       {send -- 3\r;exp_continue;}
+          Hostname*                                                     {send -- $hostname\r;exp_continue;}
+          Port*                                                         {send -- ${port}\r;exp_continue;}
+          name*                                                         {send -- \r;exp_continue;}
+          Username*                                                     {send -- ${username}\r;exp_continue;}
+          Password*                                                     {send -- ${password}\r;exp_continue;}
+          Re-enter*                                                     {send -- ${password}\r;exp_continue;}
+          connection*                                                   {send -- y\r;exp_continue;}
+          eof                                                           {exit 0;}
+      };"
+}
+setup_ambari

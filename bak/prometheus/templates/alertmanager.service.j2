@@ -1,0 +1,10 @@
+[Unit]
+Description=alertmanager
+After=network.target
+
+[Service]
+Restart=on-failure
+ExecStart={{ alertmanager_dir }}/alertmanager --config.file={{ alertmanager_dir }}/alertmanager.yml --storage.path={{ alertmanager_dir }}/data
+
+[Install]
+WantedBy=multi-user.target

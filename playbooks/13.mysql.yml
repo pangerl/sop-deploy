@@ -1,0 +1,13 @@
+- name: 部署 MySQL
+  hosts:
+    - mysql
+  roles:
+  - { role: mysql-single, when: "MySQL_MODEL == 'single'" }
+  - { role: mysql-replication, when: "MySQL_MODEL == 'replication'" }
+  gather_facts: false
+  vars:
+    container_tag: "5.7.43"
+    working_dir: "/data/mysql"
+    mysql_port: 3306
+    # 默认用户 root
+    mysql_password: "Wshoto!@2024"

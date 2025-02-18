@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  redis-master:
+    image: bitnami/{{ container_image }}
+    network_mode: "host"
+    container_name: {{ container_name }}
+    ports:
+      - {{ redis_port }}
+    volumes:
+      - {{ working_dir }}/data:/bitnami/redis/data
+      - /etc/localtime:/etc/localtim
+    environment:
+      - REDIS_PASSWORD="{{ password }}"    
+    restart: always

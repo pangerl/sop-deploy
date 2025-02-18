@@ -1,0 +1,33 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ image_dir }}"
+
+- name: download image
+  copy: src={{ project_dir }}/packages/middle_img/{{ item }} dest={{ image_dir }}/{{ item }} mode=0644
+  with_items:
+    - "{{ naming_image }}"
+    - "{{ broker_image }}" 
+
+- name: load image
+  shell: /usr/bin/docker load -i {{ image_dir }}/{{ item }}
+  ignore_errors: true
+  with_items:
+    - "{{ naming_image }}"
+    - "{{ broker_image }}"
+  
+- name: copy docker-compose-naming-broker1.yml file
+  template: src=docker-compose-naming-broker1.yml.j2 dest={{ working_dir }}/docker-compose-naming-broker1.yml mode=0755
+  
+- name: remove container  naming-broker1
+  shell: docker-compose -f docker-compose-naming-broker1.yml down
+  args:
+    chdir: "{{ working_dir }}"
+  
+- name: create container  naming-broker1
+  shell: docker-compose -f docker-compose-naming-broker1.yml up -d
+  args:
+    chdir: "{{ working_dir }}"

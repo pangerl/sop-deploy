@@ -1,0 +1,23 @@
+- name: create working_dir directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ victoria_dir }}"
+
+- name: download victoria tag
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/monitor/{{ victoria_tgz }}"
+    dest: "{{ victoria_dir }}"
+
+- name: Template victoria systemd service file
+  template:
+    src: victoriametrics.service.j2
+    dest: "{{ victoria_unit_path }}"
+    mode: 0644
+
+- name: Start the victoriametrics service
+  systemd:
+    name: victoriametrics.service
+    state: started
+    enabled: yes

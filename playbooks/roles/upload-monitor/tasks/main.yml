@@ -1,0 +1,101 @@
+- block:
+  - name: enbale prometheus agent
+    lineinfile:
+      path: "{{ categraf_dir }}/conf/config.toml"
+      regexp: '^enable'
+      line: "enable = true"
+
+  - name: scrape file
+    lineinfile:
+      path: "{{ categraf_dir }}/conf/config.toml"
+      regexp: '^scrape_config_file'
+      line: "scrape_config_file = './conf/prometheus.yml'"
+
+  - name: Template categraf prometheus.yml config file
+    template:
+      src: prometheus.yml.j2
+      dest: "{{ categraf_dir }}/conf/prometheus.yml"
+      mode: 0644
+    
+  - name: Template categraf elasticsearch config file
+    template:
+      src: elasticsearch.toml.j2
+      dest: "{{ categraf_dir }}/conf/input.elasticsearch/elasticsearch.toml"
+      mode: 0644
+
+  - name: Template categraf http_response config file
+    template:
+      src: http_response.toml.j2
+      dest: "{{ categraf_dir }}/conf/input.http_response/http_response.toml"
+      mode: 0644
+
+  - name: Template categraf mysql config file
+    template:
+      src: mysql.toml.j2
+      dest: "{{ categraf_dir }}/conf/input.mysql/mysql.toml"
+      mode: 0644
+      
+  - name: Template categraf net_response config file
+    template:
+      src: net_response.toml.j2
+      dest: "{{ categraf_dir }}/conf/input.net_response/net_response.toml"
+      mode: 0644
+  
+  - name: Template categraf postgresql config file
+    template:
+      src: postgresql.toml.j2
+      dest: "{{ categraf_dir }}/conf/input.postgresql/postgresql.toml"
+      mode: 0644
+      
+  - name: Template categraf redis config file
+    template:
+      src: redis.toml.j2
+      dest: "{{ categraf_dir }}/conf/input.redis/redis.toml"
+      mode: 0644
+    
+  # - name: Template categraf exec config file
+  #   template:
+  #     src: exec.toml.j2
+  #     dest: "{{ categraf_dir }}/conf/input.exec/exec.toml"
+  #     mode: 0644
+
+  - name: Template categraf rocketmq_offset config file
+    template:
+      src: rocketmq_offset.toml.j2
+      dest: "{{ categraf_dir }}/conf/input.rocketmq_offset/rocketmq_offset.toml"
+      mode: 0644
+      
+  - name: Template categraf exec config file
+    template:
+      src: exec.toml.j2
+      dest: "{{ categraf_dir }}/conf/input.exec/exec.toml"
+      mode: 0644
+
+  - name: create scripts directory
+    file:
+      path: "{{ categraf_dir }}/scripts"
+      state: directory
+
+  - name: Template mq scripts config file
+    template:
+      src: check_mq.sh.j2
+      dest: "{{ categraf_dir }}/scripts/check_mq.sh"
+      mode: 0755
+
+#  - name: download rocketmq tag
+#    unarchive:
+#      src: "rocketmq-all-4.9.8-bin-release.zip"
+#      dest: "{{ categraf_dir }}/scripts"
+   
+#  - name: rename rocketmq
+#    shell: 'mv rocketmq-all-4.9.8-bin-release rocketmq'
+#    args:
+#      chdir: "{{ categraf_dir }}/scripts"
+
+  - name: restart the categraf service
+    systemd:
+      name: categraf.service
+      state: restarted
+      enabled: yes
+
+  when: "inventory_hostname == groups.n9e[0]"

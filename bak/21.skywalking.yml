@@ -1,0 +1,16 @@
+- name: 部署 skywalking
+  hosts:
+    - skywalking
+  gather_facts: false
+  roles:
+    - skywalking
+  vars:
+    working_dir: "/data/skywalking"
+    # 不能超过物理内存的一半
+    jvm_mem: "6g"
+    oap_port1: 11800
+    oap_port2: 12800
+    ui_port: 8080
+
+
+      

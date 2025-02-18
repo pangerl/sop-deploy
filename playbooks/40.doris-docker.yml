@@ -1,0 +1,12 @@
+- name: 部署 doris
+  hosts:
+    - doris
+  roles:
+    - { role: doris-docker-single, when: "DORIS_MODEL == 'single'" }
+    - { role: doris-docker-cluster, when: "DORIS_MODEL == 'cluster'" }
+  gather_facts: false
+  vars:
+    doris_home: '/data/doris'
+    # jvm 配置
+    fe_jvm: "8192m"
+    be_jvm: "8192m"

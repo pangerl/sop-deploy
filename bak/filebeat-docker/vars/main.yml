@@ -1,0 +1,9 @@
+# 镜像名称
+container_name: "filebeat"
+container_image: "filebeat:7.8.1"
+
+pull: "{%- if MID_INSTALL_SOURCE == 'offline' -%} \
+          no \
+      {%- else -%} \
+          yes \
+      {%- endif -%}"

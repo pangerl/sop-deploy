@@ -1,0 +1,115 @@
+- include_tasks: mysql-client.yml
+
+- name: Create azkaban group
+  group:
+    name: "{{ azkaban_group }}"
+    state: present
+    system: yes
+  when: azkaban_create_user_group | bool
+  tags:
+    - azkaban_group
+
+- name: Create azkaban user
+  user:
+    name: "{{ azkaban_user }}"
+    group: "{{ azkaban_group }}"
+    state: present
+    createhome: no
+    system: yes
+  when: azkaban_create_user_group | bool
+  tags:
+    - azkaban_user
+
+- name: Create /data/azkaban directory if it does not exist
+  file:
+    path: /data/azkaban
+    state: directory
+    group: "{{ azkaban_group }}"
+    owner: "{{ azkaban_user }}"
+    mode: 0755
+
+- name: Extract azkaban-exec into /data/azkaban
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/{{ azkaban_exec_name }}"
+    dest: /data/azkaban
+    group: "{{ azkaban_group }}"
+    owner: "{{ azkaban_user }}"
+  args:
+    creates: /data/azkaban/azkaban-exec
+
+- name: Extract azkaban-web into /data/azkaban
+  unarchive:
+    src: "{{ project_dir }}/packages/binary_tag/{{ azkaban_web_name }}"
+    dest: /data/azkaban
+    group: "{{ azkaban_group }}"
+    owner: "{{ azkaban_user }}"
+  args:
+    creates: /data/azkaban/azkaban-web
+
+- name: Copy azkaban_db_sql file to /data/azkaban/
+  copy:
+    src: "{{ azkaban_db_sql }}"
+    dest: /data/azkaban/
+    group: "{{ azkaban_group }}"
+    owner: "{{ azkaban_user }}"
+    mode: '0644'
+
+- name: Create new databases with names 'azkaban'
+  shell: mysql -h{{ MYSQL_HOST }} -P{{ MYSQL_PORT }} -u{{ MYSQL_USER }} -p'{{ MYSQL_PASSWORD }}' -e 'create database if not exists azkaban;use azkaban;source /data/azkaban/{{ azkaban_db_sql }};'
+  run_once: true
+  ignore_errors: True
+
+- name: Template azkaban.properties.j2 file to /data/azkaban/server/conf/azkaban.properties
+  template:
+    src: azkaban-web/azkaban.properties.j2
+    dest: /data/azkaban/azkaban-web/conf/azkaban.properties
+    group: "{{ azkaban_group }}"
+    owner: "{{ azkaban_user }}"
+
+- name: Copy azkaban-users.xml file to /data/azkaban/server/conf/azkaban-users.xml
+  copy:
+    src: azkaban-users.xml
+    dest: /data/azkaban/azkaban-web/conf/azkaban-users.xml
+    group: "{{ azkaban_group }}"
+    owner: "{{ azkaban_user }}"
+
+- name: Template azkaban.properties.j2 file to /data/azkaban/executor/conf/azkaban.properties
+  template:
+    src: azkaban-executor/azkaban.properties.j2
+    dest: /data/azkaban/azkaban-exec/conf/azkaban.properties
+    group: "{{ azkaban_group }}"
+    owner: "{{ azkaban_user }}"
+
+- name: 使环境变量生效
+  shell: source ~/.bashrc
+
+- name: start azkaban-exec
+  shell: nohup /usr/bin/sh bin/start-exec.sh
+  args:
+    chdir: /data/azkaban/azkaban-exec
+
+- wait_for: port=12321 delay=10
+
+- name: activate azkaban-exec
+  # shell: curl http://127.0.0.1:12321/executor?action=activate
+  uri:
+    url: "http://127.0.0.1:12321/executor?action=activate"
+    method: GET
+    return_content: yes
+    timeout: 120
+  register: response
+  failed_when: response.status != 200
+
+- debug: var=response.content
+
+- name: start azkaban-web
+  shell: nohup /usr/bin/sh bin/start-web.sh
+  args:
+    chdir: /data/azkaban/azkaban-web
+
+- wait_for: port={{ AZ_PORT }} delay=10
+
+- name: setup azkaban complet
+  debug:
+    msg:
+    - "部署成功后请访问http://{{ azkaban_ip }}:{{ AZ_PORT }}"

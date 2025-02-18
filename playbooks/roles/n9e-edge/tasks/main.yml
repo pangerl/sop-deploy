@@ -1,0 +1,10 @@
+- import_tasks: victoria.yml
+
+- import_tasks: n9e-edge.yml
+
+#- include: blackbox.yaml
+#  when: blackbox_enabled | bool
+
+#- include: nacos-check.yaml
+#  when: nacos_check_enabled | bool
+

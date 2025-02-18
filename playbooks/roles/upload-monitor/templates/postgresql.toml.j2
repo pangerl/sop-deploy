@@ -1,0 +1,9 @@
+# Read metrics from one or many postgresql servers
+# # collect interval
+# interval = 15
+
+{% for ip in pg_lst %}
+[[instances]]
+address = "host={{ ip }} user={{ pg_user }} password={{ pg_password }} database=postgres sslmode=disable"
+ignored_databases = ["postgres", "template0", "template1"]
+{% endfor %}
